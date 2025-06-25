@@ -1,4 +1,4 @@
-package com.lostway.eventmanager.exception.dto;
+package com.lostway.eventmanager.exception;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 

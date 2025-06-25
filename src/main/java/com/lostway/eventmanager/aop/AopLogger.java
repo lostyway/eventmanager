@@ -22,7 +22,7 @@ public class AopLogger {
 
         try {
             Object returnValue = joinPoint.proceed();
-            log.info("Класс: {}. Метод: {}. Параметры: {}. Итог: {}", className, methodName, argsString, returnValue);
+            log.debug("Класс: {}. Метод: {}. Параметры: {}. Итог: {}", className, methodName, argsString, returnValue);
             return returnValue;
         } catch (Throwable e) {
             log.error("Ошибка в {}.{} с параметрами {}: {}", className, methodName, argsString, e.getMessage(), e);

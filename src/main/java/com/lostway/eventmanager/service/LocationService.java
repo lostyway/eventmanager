@@ -37,7 +37,7 @@ public class LocationService {
      * Если свободна - возвращается
      *
      * @return Локация
-     * @throws LocationIsPlannedException локаия уже занята мероприятием
+     * @throws LocationIsPlannedException локация уже занята мероприятием
      * @throws LocationNotFoundException  локация не была найдена
      */
     @Transactional
@@ -59,6 +59,7 @@ public class LocationService {
         return eventService.isLocationPlanned(locationEntity);
     }
 
+    @Transactional
     public Location findById(Integer locationId) {
         LocationEntity locationEntity = repository.findById(locationId)
                 .orElseThrow(() -> new LocationNotFoundException("Локация с ID: '%s' не была найдена".formatted(locationId)));
@@ -66,12 +67,13 @@ public class LocationService {
         return mapper.toModel(locationEntity);
     }
 
+    @Transactional
     public Location updateLocation(Integer locationId, Location updateLocation) {
         LocationEntity existing = repository.findById(locationId)
                 .orElseThrow(() -> new LocationNotFoundException("Локация для удаления: '%s' не была найдена.".formatted(locationId)));
 
-        if (existing.getCapacity() > updateLocation.getCapacity() && isLocationPlanned(existing)) {
-            throw new LocationCapacityReductionException("Нельзя уменьшить вместительность локации, если есть мероприятия");
+        if (existing.getCapacity() > updateLocation.getCapacity()) {
+            throw new LocationCapacityReductionException("Нельзя уменьшить вместительность локации");
         }
 
         LocationEntity toSave = mapper.toEntity(updateLocation);

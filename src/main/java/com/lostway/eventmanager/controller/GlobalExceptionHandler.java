@@ -3,7 +3,7 @@ package com.lostway.eventmanager.controller;
 import com.lostway.eventmanager.exception.LocationCapacityReductionException;
 import com.lostway.eventmanager.exception.LocationIsPlannedException;
 import com.lostway.eventmanager.exception.LocationNotFoundException;
-import com.lostway.eventmanager.exception.dto.ErrorMessageResponse;
+import com.lostway.eventmanager.exception.ErrorMessageResponse;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
