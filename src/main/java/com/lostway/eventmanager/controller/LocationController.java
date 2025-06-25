@@ -26,7 +26,7 @@ public class LocationController {
     public ResponseEntity<?> createLocation(@RequestBody @Valid LocationDto dto) {
         Location location = service.createLocation(mapper.toModel(dto));
         LocationDto locationDto = mapper.toDto(location);
-        return ResponseEntity.ok(locationDto);
+        return ResponseEntity.status(201).body(locationDto);
     }
 
     /**
