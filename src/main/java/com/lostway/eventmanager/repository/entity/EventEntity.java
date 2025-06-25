@@ -1,6 +1,6 @@
 package com.lostway.eventmanager.repository.entity;
 
-import com.lostway.eventmanager.roles.EventStatus;
+import com.lostway.eventmanager.enums.EventStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;

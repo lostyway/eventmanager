@@ -1,4 +1,4 @@
-package com.lostway.eventmanager.roles;
+package com.lostway.eventmanager.enums;
 
 import lombok.Getter;
 

@@ -1,5 +1,6 @@
 package com.lostway.eventmanager.service;
 
+import com.lostway.eventmanager.exception.LocationCapacityReductionException;
 import com.lostway.eventmanager.exception.LocationIsPlannedException;
 import com.lostway.eventmanager.exception.LocationNotFoundException;
 import com.lostway.eventmanager.mapper.LocationMapper;
@@ -34,6 +35,7 @@ public class LocationService {
     /**
      * Проверяется локация, если она уже занята ивентом -> отказ.
      * Если свободна - возвращается
+     *
      * @return Локация
      * @throws LocationIsPlannedException локаия уже занята мероприятием
      * @throws LocationNotFoundException  локация не была найдена
@@ -41,7 +43,7 @@ public class LocationService {
     @Transactional
     public Location removeById(Integer locationId) {
         LocationEntity locationEntity = repository.findById(locationId)
-                .orElseThrow(() -> new LocationNotFoundException("Локация не была найдена"));
+                .orElseThrow(() -> new LocationNotFoundException("Локация с ID: '%s' не была найдена".formatted(locationId)));
 
         if (isLocationPlanned(locationEntity)) {
             throw new LocationIsPlannedException("Локация уже занята мероприятием");
@@ -55,5 +57,26 @@ public class LocationService {
 
     private boolean isLocationPlanned(LocationEntity locationEntity) {
         return eventService.isLocationPlanned(locationEntity);
+    }
+
+    public Location findById(Integer locationId) {
+        LocationEntity locationEntity = repository.findById(locationId)
+                .orElseThrow(() -> new LocationNotFoundException("Локация с ID: '%s' не была найдена".formatted(locationId)));
+
+        return mapper.toModel(locationEntity);
+    }
+
+    public Location updateLocation(Integer locationId, Location updateLocation) {
+        LocationEntity existing = repository.findById(locationId)
+                .orElseThrow(() -> new LocationNotFoundException("Локация для удаления: '%s' не была найдена.".formatted(locationId)));
+
+        if (existing.getCapacity() > updateLocation.getCapacity() && isLocationPlanned(existing)) {
+            throw new LocationCapacityReductionException("Нельзя уменьшить вместительность локации, если есть мероприятия");
+        }
+
+        LocationEntity toSave = mapper.toEntity(updateLocation);
+        toSave.setId(existing.getId());
+
+        return mapper.toModel(repository.save(toSave));
     }
 }
