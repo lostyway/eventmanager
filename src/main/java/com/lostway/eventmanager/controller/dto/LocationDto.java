@@ -1,7 +1,7 @@
 package com.lostway.eventmanager.controller.dto;
 
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 @ToString
@@ -15,14 +15,15 @@ public class LocationDto {
 
     private Integer id;
 
-    @NotNull
+    @NotBlank(message = "Название не может быть пустым")
     private String name;
 
-    @NotNull
+    @NotBlank(message = "Адрес не может быть пустым")
     private String address;
 
-    @Min(5)
+    @Min(value = 5, message = "Заполненность должна быть больше 5")
     private Integer capacity;
 
+    @NotBlank(message = "Описание не может быть пустым")
     private String description;
 }

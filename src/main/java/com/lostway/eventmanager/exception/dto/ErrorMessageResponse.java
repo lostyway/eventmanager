@@ -1,6 +1,8 @@
 package com.lostway.eventmanager.exception.dto;
 
-import lombok.*;
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+import java.time.LocalDateTime;
 
 /**
  * Класс, описывающий ошибку, которая произошла при обращении к контроллеру. Меняется в зависимости от кода ошибки. <p>
@@ -9,17 +11,10 @@ import lombok.*;
  * dateTime <-- Дата и время возникновения ошибки. Формат "YYYY-MM-DDThh:mm:ss"<p>
  */
 
-@ToString
-@Getter
-@Setter
-@EqualsAndHashCode
-@AllArgsConstructor
-@NoArgsConstructor
-public class ErrorMessageResponse {
-
-    private String message;
-
-    private String detailedMessage;
-
-    private String dateTime;
+public record ErrorMessageResponse(
+        String message,
+        String detailedMessage,
+        @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+        LocalDateTime dateTime
+) {
 }
