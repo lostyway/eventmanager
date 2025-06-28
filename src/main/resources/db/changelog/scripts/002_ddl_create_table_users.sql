@@ -1,7 +1,7 @@
 create table users
 (
-    id    serial primary key,
-    login text,
-    age   int,
-    role  text
+    id            bigserial primary key,
+    login         text unique,
+    password_hash text not null,
+    role          text not null
 );
