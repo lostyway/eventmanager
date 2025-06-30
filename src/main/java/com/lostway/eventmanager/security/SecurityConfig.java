@@ -23,6 +23,14 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.POST, "/locations").hasRole("ADMIN")
                                 .requestMatchers(HttpMethod.PUT, "/locations/{locationId}").hasRole("ADMIN")
                                 .requestMatchers(HttpMethod.DELETE, "/locations/{locationId}").hasRole("ADMIN")
+                                .requestMatchers(
+                                        "/swagger-ui/**",
+                                        "/v3/api-docs/**",
+                                        "/swagger-ui.html",
+                                        "/swagger-resources/**",
+                                        "/webjars/**",
+                                        "/openapi.yaml"
+                                ).permitAll()
                                 .anyRequest().authenticated()
                 )
                 .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
