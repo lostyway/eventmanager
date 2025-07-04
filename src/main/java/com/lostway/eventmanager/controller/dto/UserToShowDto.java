@@ -1,4 +1,4 @@
-package com.lostway.eventmanager.repository.entity;
+package com.lostway.eventmanager.controller.dto;
 
 import com.lostway.eventmanager.enums.Role;
 import jakarta.persistence.*;
@@ -11,19 +11,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.List;
 
-@Entity
-@Table(name = "users")
-@AllArgsConstructor
-@NoArgsConstructor
-@Getter
-@Setter
-@ToString
-@EqualsAndHashCode
-@Builder
-public class UserEntity implements UserDetails {
+@Data
+public class UserToShowDto implements UserDetails {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotNull

@@ -1,0 +1,26 @@
+spring:
+  application:
+    name: eventmanager
+  liquibase:
+    enabled: true
+    change-log: db/changelog/master.xml
+  datasource:
+    url: jdbc:postgresql://localhost:5433/eventmanagerdb
+    username: postgres
+    password: pass
+    hikari:
+      max-lifetime: 1_800_000
+      maximum-pool-size: 20
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+
+logging:
+  level:
+    com.lostway.eventmanager: info
+    root: info
+springdoc:
+  swagger-ui:
+    url: /openapi.yaml
+secret.key: verylongsecretkeyforpetproject
