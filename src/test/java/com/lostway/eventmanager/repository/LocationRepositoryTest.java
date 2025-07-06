@@ -14,15 +14,16 @@ class LocationRepositoryTest extends IntegrationTestBase {
 
     @Test
     void testLocationRepository() {
-        LocationEntity locationEntity = LocationEntity.builder()
+        var locationEntity = LocationEntity.builder()
                 .name("locationTest")
                 .address("AddressTest")
                 .capacity(20)
                 .description("DescriptionTest")
                 .build();
 
-        LocationEntity savedEntity = locationRepository.save(locationEntity);
+        var savedEntity = locationRepository.save(locationEntity);
         var locationFindByIdOpt = locationRepository.findById(savedEntity.getId());
+
         assertThat(locationFindByIdOpt.isPresent()).isTrue();
         assertThat(locationFindByIdOpt.get().getName()).isEqualTo(locationEntity.getName());
         assertThat(locationFindByIdOpt.get().getCapacity()).isEqualTo(locationEntity.getCapacity());
