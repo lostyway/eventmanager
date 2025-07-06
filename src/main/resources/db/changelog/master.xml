@@ -1,11 +1,73 @@
-<?xml version="1.0" encoding="UTF-8" ?>
 <databaseChangeLog
         xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
-         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
-    <include file="scripts/001_ddl_create_table_locations.sql" relativeToChangelogFile="true"/>
-    <include file="scripts/002_ddl_create_table_users.sql" relativeToChangelogFile="true"/>
-    <include file="scripts/003_dml_insert_table_users.sql" relativeToChangelogFile="true"/>
-    <include file="scripts/004_ddl_create_table_events.sql" relativeToChangelogFile="true"/>
+        xsi:schemaLocation="
+      http://www.liquibase.org/xml/ns/dbchangelog
+      https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.5.xsd">
+
+    <changeSet id="001" author="lostyway">
+        <comment>Создание таблицы локаций</comment>
+        <sql>
+            create table locations
+            (
+                id          serial primary key,
+                name        text,
+                address     text,
+                capacity    int,
+                description text
+            );
+        </sql>
+        <rollback>
+            drop table if exists locations;
+        </rollback>
+    </changeSet>
+    <changeSet id="002" author="lostyway">
+        <comment>Создание таблиц пользователей</comment>
+        <sql>
+            create table users
+            (
+                id            bigserial primary key,
+                login         text unique,
+                password_hash text not null,
+                role          text not null
+            );
+        </sql>
+        <rollback>
+            drop table if exists users cascade;
+        </rollback>
+    </changeSet>
+    <changeSet id="003" author="lostyway">
+        <comment>Добавление пользователей в таблицу users</comment>
+        <sql>
+            insert into users(id, login, password_hash, role)
+            values (1, 'lostway', '$2a$12$.tPrr5F0eJ6y9EzmQN0ns.CxAf2xlBxFk6rkZe04UvtwKGurSZSkm', 'ROLE_USER');
+
+            insert into users(id, login, password_hash, role)
+            values (2, 'admin', '$2a$12$iOO8grBcOQ/pSU61RgTHvO9K.Fcdq18bLIazAIPkntzQjdo5fAot6', 'ROLE_ADMIN');
+        </sql>
+        <rollback>
+            delete from users where id in (1, 2);
+        </rollback>
+    </changeSet>
+    <changeSet id="004" author="lostyway">
+        <comment>Создание таблицы мероприятий</comment>
+        <sql>
+            create table events
+            (
+                id              serial primary key,
+                name            text,
+                owner_id        int references users (id),
+                max_places      int,
+                occupied_places int,
+                date            timestamp,
+                cost            decimal,
+                duration        int,
+                location_id     int references locations (id),
+                status          text
+            );
+        </sql>
+        <rollback>
+            drop table if exists events;
+        </rollback>
+    </changeSet>
 </databaseChangeLog>
