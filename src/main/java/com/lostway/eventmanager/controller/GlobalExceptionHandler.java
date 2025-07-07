@@ -5,6 +5,7 @@ import com.lostway.eventmanager.exception.LocationIsPlannedException;
 import com.lostway.eventmanager.exception.LocationNotFoundException;
 import com.lostway.eventmanager.exception.ErrorMessageResponse;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindException;
@@ -61,6 +62,12 @@ public class GlobalExceptionHandler {
                         "Данные сущности введены некорректно",
                         getDetailedMessage(e),
                         LocalDateTime.now()));
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<String> handelDataIntegrityViolationException(DataIntegrityViolationException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body("Ошибка данных: нарушены ограничения БД");
     }
 
     private String getDetailedMessage(BindException ex) {

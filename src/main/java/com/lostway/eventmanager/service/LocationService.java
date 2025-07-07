@@ -1,5 +1,6 @@
 package com.lostway.eventmanager.service;
 
+import com.lostway.eventmanager.exception.LocationAlreadyExists;
 import com.lostway.eventmanager.exception.LocationCapacityReductionException;
 import com.lostway.eventmanager.exception.LocationIsPlannedException;
 import com.lostway.eventmanager.exception.LocationNotFoundException;
@@ -28,8 +29,13 @@ public class LocationService {
 
     @Transactional
     public Location createLocation(Location location) {
-        LocationEntity entity = repository.save(mapper.toEntity(location));
-        return mapper.toModel(entity);
+        if (repository.existsByNameAndAddressAndCapacity(location.getName(), location.getAddress(), location.getCapacity())) {
+            throw new LocationAlreadyExists("Такая локация уже существует!");
+        }
+
+        LocationEntity locationEntity = mapper.toEntity(location);
+        LocationEntity saved = repository.save(locationEntity);
+        return mapper.toModel(saved);
     }
 
     /**

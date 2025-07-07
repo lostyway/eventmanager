@@ -11,10 +11,10 @@
             create table locations
             (
                 id          serial primary key,
-                name        text,
-                address     text,
-                capacity    int,
-                description text
+                name        text not null,
+                address     text not null,
+                capacity    int not null,
+                description text not null
             );
         </sql>
         <rollback>
@@ -57,11 +57,11 @@
                 id              serial primary key,
                 name            text,
                 owner_id        int references users (id),
-                max_places      int,
-                occupied_places int,
-                date            timestamp,
-                cost            decimal,
-                duration        int,
+                max_places      int not null,
+                occupied_places int not null,
+                date            timestamp not null,
+                cost            decimal not null,
+                duration        int not null,
                 location_id     int references locations (id),
                 status          text
             );
