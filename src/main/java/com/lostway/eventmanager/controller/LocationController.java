@@ -6,8 +6,10 @@ import com.lostway.eventmanager.service.LocationService;
 import com.lostway.eventmanager.service.model.Location;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -18,10 +20,10 @@ public class LocationController {
     private final LocationMapper mapper;
 
     @GetMapping
-    @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<?> getAll() {
-        var list = service.getAll();
-        return ResponseEntity.ok(mapper.toDtoList(list));
+    public ResponseEntity<Page<LocationDto>> getAll(
+            @PageableDefault(size = 10, page = 5, sort = "name") Pageable pageable) {
+        Page<LocationDto> page = service.getAll(pageable).map(mapper::toDto);
+        return ResponseEntity.ok(page);
     }
 
     @PostMapping
