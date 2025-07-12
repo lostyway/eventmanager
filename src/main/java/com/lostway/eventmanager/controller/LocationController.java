@@ -21,7 +21,7 @@ public class LocationController {
 
     @GetMapping
     public ResponseEntity<Page<LocationDto>> getAll(
-            @PageableDefault(size = 10, page = 5, sort = "name") Pageable pageable) {
+            @PageableDefault(size = 10, sort = "name") Pageable pageable) {
         Page<LocationDto> page = service.getAll(pageable).map(mapper::toDto);
         return ResponseEntity.ok(page);
     }
