@@ -7,6 +7,8 @@ import com.lostway.eventmanager.service.model.Location;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -17,6 +19,7 @@ public class LocationController {
     private final LocationMapper mapper;
 
     @GetMapping
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<?> getAll() {
         var list = service.getAll();
         return ResponseEntity.ok(mapper.toDtoList(list));
