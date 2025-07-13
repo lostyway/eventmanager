@@ -9,5 +9,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface LocationRepository extends JpaRepository<LocationEntity, Integer> {
     boolean existsByNameAndAddressAndCapacity(String name, String address, Integer capacity);
+
     Page<LocationEntity> findAll(Pageable pageable);
 }

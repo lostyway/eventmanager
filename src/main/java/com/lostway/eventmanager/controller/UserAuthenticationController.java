@@ -20,7 +20,6 @@ public class UserAuthenticationController {
     private final UserService userService;
     private final UserMapper mapper;
 
-
     @PostMapping
     public UserToShowDto registerUser(@RequestBody @Valid UserRegistryDto userDto) {
         if (userService.existsByLogin(userDto.getLogin())) {
@@ -39,7 +38,7 @@ public class UserAuthenticationController {
     }
 
     @GetMapping("/{userId}")
-    public UserToShowDto ById(@PathVariable @NotBlank Long userId) {
+    public UserToShowDto byId(@PathVariable @NotBlank Long userId) {
         UserModel model = userService.getUserById(userId);
         return mapper.toUserToShowDto(model);
     }

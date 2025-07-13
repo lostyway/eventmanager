@@ -1,5 +1,6 @@
 package com.lostway.eventmanager.repository.entity;
 
+import com.lostway.eventmanager.audit.AuditableEntity;
 import com.lostway.eventmanager.enums.Role;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -18,9 +19,9 @@ import java.util.List;
 @Getter
 @Setter
 @ToString
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = false)
 @Builder
-public class UserEntity implements UserDetails {
+public class UserEntity extends AuditableEntity implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

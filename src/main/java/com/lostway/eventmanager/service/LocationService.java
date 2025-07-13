@@ -9,6 +9,7 @@ import com.lostway.eventmanager.repository.LocationRepository;
 import com.lostway.eventmanager.repository.entity.LocationEntity;
 import com.lostway.eventmanager.service.model.Location;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class LocationService {
     private final LocationMapper mapper;
@@ -23,13 +25,13 @@ public class LocationService {
     private final EventService eventService;
 
     @Transactional(readOnly = true)
-    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('USER')")
+//    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('USER')")
     public Page<Location> getAll(Pageable pageable) {
         return repository.findAll(pageable).map(mapper::toModel);
     }
 
     @Transactional
-    @PreAuthorize("hasAuthority('ADMIN')")
+//    @PreAuthorize("hasAuthority('ADMIN')")
     public Location createLocation(Location location) {
         if (repository.existsByNameAndAddressAndCapacity(location.getName(), location.getAddress(), location.getCapacity())) {
             throw new LocationAlreadyExists("Такая локация уже существует!");
@@ -49,7 +51,7 @@ public class LocationService {
      * @throws LocationNotFoundException  локация не была найдена
      */
     @Transactional
-    @PreAuthorize("hasAuthority('ADMIN')")
+//    @PreAuthorize("hasAuthority('ADMIN')")
     public Location removeById(Integer locationId) {
         LocationEntity locationEntity = repository.findById(locationId)
                 .orElseThrow(() -> new LocationNotFoundException("Локация с ID: '%s' не была найдена".formatted(locationId)));
@@ -78,7 +80,7 @@ public class LocationService {
     }
 
     @Transactional
-    @PreAuthorize("hasAuthority('ADMIN')")
+//    @PreAuthorize("hasAuthority('ADMIN')")
     public Location updateLocation(Integer locationId, Location updateLocation) {
         LocationEntity existing = repository.findById(locationId)
                 .orElseThrow(() -> new LocationNotFoundException("Локация для удаления: '%s' не была найдена.".formatted(locationId)));

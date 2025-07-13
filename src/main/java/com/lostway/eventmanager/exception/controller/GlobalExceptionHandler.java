@@ -1,8 +1,12 @@
 package com.lostway.eventmanager.exception.controller;
 
-import com.lostway.eventmanager.exception.*;
+import com.lostway.eventmanager.exception.LocationAlreadyExists;
+import com.lostway.eventmanager.exception.LocationCapacityReductionException;
+import com.lostway.eventmanager.exception.LocationIsPlannedException;
+import com.lostway.eventmanager.exception.LocationNotFoundException;
 import com.lostway.eventmanager.exception.dto.ErrorMessageResponse;
 import jakarta.persistence.EntityNotFoundException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,13 +18,15 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.stream.Collectors;
 
-import static java.time.LocalDateTime.*;
+import static java.time.LocalDateTime.now;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(LocationNotFoundException.class)
     public ResponseEntity<ErrorMessageResponse> handelLocationNotFoundException(LocationNotFoundException e) {
+        log.error("Exception handled:", e);
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(new ErrorMessageResponse(
                         "Сущность не найдена",
@@ -30,6 +36,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(LocationIsPlannedException.class)
     public ResponseEntity<ErrorMessageResponse> handelLocationIsPlannedException(LocationIsPlannedException e) {
+        log.error("Exception handled:", e);
         return ResponseEntity.badRequest()
                 .body(new ErrorMessageResponse(
                         "Локация уже занята мероприятием",
@@ -39,6 +46,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(LocationCapacityReductionException.class)
     public ResponseEntity<ErrorMessageResponse> handelLocationCapacityReductionException(LocationCapacityReductionException e) {
+        log.error("Exception handled:", e);
         return ResponseEntity.badRequest()
                 .body(new ErrorMessageResponse(
                         "Ошибка изменения вместимости локации",
@@ -48,6 +56,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<ErrorMessageResponse> handelEntityNotFoundException(EntityNotFoundException e) {
+        log.error("Exception handled:", e);
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(new ErrorMessageResponse(
                         "Сущность не была найдена",
@@ -57,6 +66,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorMessageResponse> handelMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+        log.error("Exception handled:", e);
         return ResponseEntity.badRequest()
                 .body(new ErrorMessageResponse(
                         "Данные сущности введены некорректно",
@@ -66,12 +76,14 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<String> handelDataIntegrityViolationException(DataIntegrityViolationException e) {
+        log.error("Exception handled:", e);
         return ResponseEntity.badRequest()
                 .body("Ошибка данных: нарушены ограничения БД");
     }
 
     @ExceptionHandler(LocationAlreadyExists.class)
     public ResponseEntity<ErrorMessageResponse> handelLocationAlreadyExists(LocationAlreadyExists e) {
+        log.error("Exception handled:", e);
         return ResponseEntity.badRequest()
                 .body(new ErrorMessageResponse(
                         "Локация уже существует.",
@@ -81,6 +93,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ErrorMessageResponse> handelAccessDeniedException(AccessDeniedException e) {
+        log.error("Exception handled:", e);
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
                 .body(new ErrorMessageResponse(
                         "Недостаточно прав для выполнения операции",

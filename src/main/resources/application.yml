@@ -19,8 +19,9 @@ spring:
 
 logging:
   level:
-    com.lostway.eventmanager: debug
     root: info
+    com.lostway.eventmanager.controller: info
+    com.lostway.eventmanager.service: debug
 springdoc:
   swagger-ui:
     url: /openapi.yaml

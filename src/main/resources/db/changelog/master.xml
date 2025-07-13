@@ -13,7 +13,7 @@
                 id          serial primary key,
                 name        text not null,
                 address     text not null,
-                capacity    int not null,
+                capacity    int  not null,
                 description text not null
             );
         </sql>
@@ -57,11 +57,11 @@
                 id              serial primary key,
                 name            text,
                 owner_id        int references users (id),
-                max_places      int not null,
-                occupied_places int not null,
+                max_places      int       not null,
+                occupied_places int       not null,
                 date            timestamp not null,
-                cost            decimal not null,
-                duration        int not null,
+                cost            decimal   not null,
+                duration        int       not null,
                 location_id     int references locations (id),
                 status          text
             );
@@ -69,5 +69,18 @@
         <rollback>
             drop table if exists events;
         </rollback>
+    </changeSet>
+    <changeSet id="005" author="lostyway">
+        <comment>Добавления аудита для таблицы locations</comment>
+        <sql>
+            alter table locations
+                add column created_by text;
+            alter table locations
+                add column created_at timestamp;
+            alter table locations
+                add column last_modified_by text;
+            alter table locations
+                add column last_modified_at timestamp;
+        </sql>
     </changeSet>
 </databaseChangeLog>
