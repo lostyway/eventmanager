@@ -19,7 +19,7 @@ spring:
 
 logging:
   level:
-    com.lostway.eventmanager: info
+    com.lostway.eventmanager: debug
     root: info
 springdoc:
   swagger-ui:

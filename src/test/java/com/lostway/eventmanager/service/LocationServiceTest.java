@@ -8,10 +8,14 @@ import com.lostway.eventmanager.service.model.Location;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertThrows;
+import org.springframework.security.test.context.support.*;
 
+@WithMockUser(authorities = {"ADMIN"})
 class LocationServiceTest extends IntegrationTestBase {
 
     @Autowired
@@ -69,7 +73,7 @@ class LocationServiceTest extends IntegrationTestBase {
         service.createLocation(location);
         service.createLocation(newSecondLocation);
 
-        var list = service.getAll();
+        var list = service.getAll(Pageable.ofSize(10));
 
         assertThat(list).hasSize(2);
     }
@@ -83,7 +87,6 @@ class LocationServiceTest extends IntegrationTestBase {
                 () -> service.createLocation(saveLocationSecond));
         var savedLocationFirst = service.findById(savedLocation.getId());
 
-
         assertThat(thrown).hasMessageContaining("Такая локация уже существует!");
         assertThat(savedLocationFirst).isNotNull();
         assertThat(savedLocationFirst).isEqualTo(location);
@@ -91,7 +94,7 @@ class LocationServiceTest extends IntegrationTestBase {
 
     @Test
     void whenSavedIsFailedBecauseOfIncorrectLocation() {
-        assertThat(service.getAll()).isEmpty();
+        assertThat(service.getAll(Pageable.ofSize(10))).isEmpty();
     }
 
     @Test
@@ -141,11 +144,11 @@ class LocationServiceTest extends IntegrationTestBase {
         var locationToReplace = service.createLocation(location);
         var toUpdate = service.createLocation(newSecondLocation);
 
-        assertThat(service.getAll()).hasSize(2);
+        assertThat(service.getAll(Pageable.ofSize(10))).hasSize(2);
 
         service.updateLocation(locationToReplace.getId(), toUpdate);
 
-        assertThat(service.getAll()).hasSize(2);
+        assertThat(service.getAll(Pageable.ofSize(10))).hasSize(2);
         assertThat(service.findById(locationToReplace.getId())).isNotNull();
         assertThat(service.findById(locationToReplace.getId()).getName()).isEqualTo(toUpdate.getName());
         assertThat(service.findById(toUpdate.getId())).isNotNull();

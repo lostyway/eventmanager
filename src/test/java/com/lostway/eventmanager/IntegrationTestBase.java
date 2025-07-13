@@ -11,17 +11,17 @@ import org.testcontainers.containers.PostgreSQLContainer;
 @Transactional
 public class IntegrationTestBase {
 
-    public static final PostgreSQLContainer<?> container = new PostgreSQLContainer<>("postgres:15");
+    public static final PostgreSQLContainer<?> CONTAINER = new PostgreSQLContainer<>("postgres:15");
 
     @BeforeAll
     static void runContainer() {
-        container.start();
+        CONTAINER.start();
     }
 
     @DynamicPropertySource
     static void postgresProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", container::getJdbcUrl);
-        registry.add("spring.datasource.username", container::getUsername);
-        registry.add("spring.datasource.password", container::getPassword);
+        registry.add("spring.datasource.url", CONTAINER::getJdbcUrl);
+        registry.add("spring.datasource.username", CONTAINER::getUsername);
+        registry.add("spring.datasource.password", CONTAINER::getPassword);
     }
 }
