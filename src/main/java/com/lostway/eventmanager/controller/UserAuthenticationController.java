@@ -1,5 +1,7 @@
 package com.lostway.eventmanager.controller;
 
+import com.lostway.eventmanager.controller.dto.JwtResponseDto;
+import com.lostway.eventmanager.controller.dto.UserLoginDto;
 import com.lostway.eventmanager.controller.dto.UserRegistryDto;
 import com.lostway.eventmanager.controller.dto.UserToShowDto;
 import com.lostway.eventmanager.exception.UserAlreadyExistException;
@@ -32,14 +34,16 @@ public class UserAuthenticationController {
                 .body(mapper.toUserToShowDto(registeredUserModel));
     }
 
+    @PostMapping("/auth")
+    public ResponseEntity<JwtResponseDto> auth(@RequestBody @Valid UserLoginDto loginDto) {
+        String token = userService.auth(mapper.toModel(loginDto));
+
+        return ResponseEntity.ok(new JwtResponseDto(token));
+    }
+
     @GetMapping("/{userId}")
     public UserToShowDto byId(@PathVariable @NotBlank Long userId) {
         UserModel model = userService.getUserById(userId);
         return mapper.toUserToShowDto(model);
-    }
-
-    @PostMapping("/auth")
-    public String authg(@PathVariable @NotBlank Long userId) {
-        return "test";
     }
 }

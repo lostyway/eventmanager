@@ -8,6 +8,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.BindException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -115,6 +116,28 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorMessageResponse> handleUserAlreadyExistException(UserAlreadyExistException e) {
         log.error("Exception handled:", e);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorMessageResponse(
+                        "Некорректный запрос",
+                        e.getMessage(),
+                        now()
+                ));
+    }
+
+    @ExceptionHandler(IncorrectPasswordException.class)
+    public ResponseEntity<ErrorMessageResponse> handleIncorrectPasswordException(IncorrectPasswordException e) {
+        log.error("Exception handled:", e);
+        return ResponseEntity.badRequest()
+                .body(new ErrorMessageResponse(
+                        "Некорректный запрос",
+                        e.getMessage(),
+                        now()
+                ));
+    }
+
+    @ExceptionHandler(UsernameNotFoundException.class)
+    public ResponseEntity<ErrorMessageResponse> handleUsernameNotFoundException(UsernameNotFoundException e) {
+        log.error("Exception handled:", e);
+        return ResponseEntity.badRequest()
                 .body(new ErrorMessageResponse(
                         "Некорректный запрос",
                         e.getMessage(),

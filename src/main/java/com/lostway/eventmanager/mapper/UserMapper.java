@@ -1,5 +1,6 @@
 package com.lostway.eventmanager.mapper;
 
+import com.lostway.eventmanager.controller.dto.UserLoginDto;
 import com.lostway.eventmanager.controller.dto.UserRegistryDto;
 import com.lostway.eventmanager.controller.dto.UserToShowDto;
 import com.lostway.eventmanager.repository.entity.UserEntity;
@@ -16,4 +17,6 @@ public interface UserMapper {
     UserToShowDto toUserToShowDto(UserModel registeredUserModel);
 
     UserEntity toEntity(UserModel userModel);
+
+    UserModel toModel(UserLoginDto loginDto);
 }

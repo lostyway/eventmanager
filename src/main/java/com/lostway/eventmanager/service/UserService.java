@@ -1,6 +1,7 @@
 package com.lostway.eventmanager.service;
 
 import com.lostway.eventmanager.enums.Role;
+import com.lostway.eventmanager.exception.IncorrectPasswordException;
 import com.lostway.eventmanager.mapper.UserMapper;
 import com.lostway.eventmanager.repository.UserRepository;
 import com.lostway.eventmanager.repository.entity.UserEntity;
@@ -12,6 +13,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,10 +24,13 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserMapper mapper;
     private final JWTUtil jwtUtil;
+    private final PasswordEncoder encoder;
+    private final PasswordEncoder passwordEncoder;
 
     @Transactional
     public UserModel registerUser(UserModel model) {
         model.setRole(Role.USER);
+        model.setPassword(encoder.encode(model.getPassword()));
         UserEntity entity = mapper.toEntity(model);
         UserEntity saved = userRepository.save(entity);
         return mapper.toModel(saved);
@@ -57,5 +62,15 @@ public class UserService {
                 .password(entity.getPassword())
                 .roles(entity.getRole().name())
                 .build();
+    }
+
+    public String auth(UserModel model) {
+        UserModel userModelInBase = findByLogin(model.getLogin());
+
+        if (!passwordEncoder.matches(model.getPassword(), userModelInBase.getPassword())) {
+            throw new IncorrectPasswordException("Пароль был введен неверно!");
+        }
+
+        return jwtUtil.generateToken(model);
     }
 }
