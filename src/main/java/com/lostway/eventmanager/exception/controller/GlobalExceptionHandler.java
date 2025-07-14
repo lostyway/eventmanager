@@ -1,9 +1,6 @@
 package com.lostway.eventmanager.exception.controller;
 
-import com.lostway.eventmanager.exception.LocationAlreadyExists;
-import com.lostway.eventmanager.exception.LocationCapacityReductionException;
-import com.lostway.eventmanager.exception.LocationIsPlannedException;
-import com.lostway.eventmanager.exception.LocationNotFoundException;
+import com.lostway.eventmanager.exception.*;
 import com.lostway.eventmanager.exception.dto.ErrorMessageResponse;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
@@ -114,12 +111,23 @@ public class GlobalExceptionHandler {
                 ));
     }
 
+    @ExceptionHandler(UserAlreadyExistException.class)
+    public ResponseEntity<ErrorMessageResponse> handleUserAlreadyExistException(UserAlreadyExistException e) {
+        log.error("Exception handled:", e);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorMessageResponse(
+                        "Некорректный запрос",
+                        e.getMessage(),
+                        now()
+                ));
+    }
+
     @ExceptionHandler(Throwable.class)
     public ResponseEntity<ErrorMessageResponse> handleAllException(Throwable e) {
         log.error("Exception handled:", e);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(new ErrorMessageResponse(
-                        "Произошла непредвиденная ошибка сервера",
+                        "Внутренняя ошибка сервера",
                         e.getMessage(),
                         now()
                 ));

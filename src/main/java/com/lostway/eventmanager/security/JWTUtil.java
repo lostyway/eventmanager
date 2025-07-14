@@ -1,5 +1,6 @@
 package com.lostway.eventmanager.security;
 
+import com.lostway.eventmanager.service.model.UserModel;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -27,12 +28,13 @@ public class JWTUtil {
         this.expirationTime = expirationTime;
     }
 
-    public String generateToken(String username) {
+    public String generateToken(UserModel user) {
         return Jwts.builder()
                 .setSubject("User details")
-                .setClaims(Map.of("username", username))
+                .setClaims(Map.of("role", user.getRole().name()))
                 .setIssuedAt(new Date())
-                .setAudience("USER")
+                .setSubject(user.getLogin())
+                .setAudience("USERS")
                 .setIssuer("event manager")
                 .setExpiration(Date.from(ZonedDateTime.now().plusSeconds(expirationTime).toInstant()))
                 .signWith(secretKey, SignatureAlgorithm.HS256)
@@ -46,7 +48,7 @@ public class JWTUtil {
                     .build()
                     .parseClaimsJws(token);
 
-            return claims.getBody().get("username", String.class);
+            return claims.getBody().getSubject();
         } catch (Exception e) {
             throw new JwtException("Invalid JWT token");
         }

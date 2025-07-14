@@ -24,7 +24,7 @@ logging:
 springdoc:
   swagger-ui:
     url: /openapi.yaml
-secret.key: verylongsecretkeyforpetproject
+secret.key: verylongsecretkeyforpetprojecteventmanagerlostway2025
 
 #In second
 expiration.time: 3600

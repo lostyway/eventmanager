@@ -28,8 +28,9 @@
             (
                 id            bigserial primary key,
                 login         text unique,
-                password_hash text not null,
-                role          text not null
+                password_hash text    not null,
+                age           integer not null,
+                role          text    not null
             );
         </sql>
         <rollback>
@@ -37,19 +38,6 @@
         </rollback>
     </changeSet>
     <changeSet id="003" author="lostyway">
-        <comment>Добавление пользователей в таблицу users</comment>
-        <sql>
-            insert into users(id, login, password_hash, role)
-            values (1, 'lostway', '$2a$12$.tPrr5F0eJ6y9EzmQN0ns.CxAf2xlBxFk6rkZe04UvtwKGurSZSkm', 'ROLE_USER');
-
-            insert into users(id, login, password_hash, role)
-            values (2, 'admin', '$2a$12$iOO8grBcOQ/pSU61RgTHvO9K.Fcdq18bLIazAIPkntzQjdo5fAot6', 'ROLE_ADMIN');
-        </sql>
-        <rollback>
-            delete from users where id in (1, 2);
-        </rollback>
-    </changeSet>
-    <changeSet id="004" author="lostyway">
         <comment>Создание таблицы мероприятий</comment>
         <sql>
             create table events
@@ -70,7 +58,7 @@
             drop table if exists events;
         </rollback>
     </changeSet>
-    <changeSet id="005" author="lostyway">
+    <changeSet id="004" author="lostyway">
         <comment>Добавления аудита для таблицы locations</comment>
         <sql>
             alter table locations
@@ -80,6 +68,19 @@
             alter table locations
                 add column last_modified_by text;
             alter table locations
+                add column last_modified_at timestamp;
+        </sql>
+    </changeSet>
+    <changeSet id="005" author="lostway">
+        <comment>Добавление аудита для таблицы users</comment>
+        <sql>
+            alter table users
+                add column created_by text;
+            alter table users
+                add column created_at timestamp;
+            alter table users
+                add column last_modified_by text;
+            alter table users
                 add column last_modified_at timestamp;
         </sql>
     </changeSet>
