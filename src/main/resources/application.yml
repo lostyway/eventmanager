@@ -25,3 +25,6 @@ springdoc:
   swagger-ui:
     url: /openapi.yaml
 secret.key: verylongsecretkeyforpetproject
+
+#In second
+expiration.time: 3600
