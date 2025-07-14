@@ -15,6 +15,7 @@ import org.springframework.validation.BindException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.util.stream.Collectors;
 
@@ -97,6 +98,28 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
                 .body(new ErrorMessageResponse(
                         "Недостаточно прав для выполнения операции",
+                        e.getMessage(),
+                        now()
+                ));
+    }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<ErrorMessageResponse> handleNoResourceException(NoResourceFoundException e) {
+        log.error("Exception handled:", e);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(new ErrorMessageResponse(
+                        "Данный адрес не был найден",
+                        e.getMessage(),
+                        now()
+                ));
+    }
+
+    @ExceptionHandler(Throwable.class)
+    public ResponseEntity<ErrorMessageResponse> handleAllException(Throwable e) {
+        log.error("Exception handled:", e);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ErrorMessageResponse(
+                        "Произошла непредвиденная ошибка сервера",
                         e.getMessage(),
                         now()
                 ));
