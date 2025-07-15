@@ -65,7 +65,6 @@ public class UserService {
     }
 
     public String auth(UserModel model) {
-        //todo поправить на 404 ошибку
         UserModel userModelInBase = findByLogin(model.getLogin());
 
         if (!passwordEncoder.matches(model.getPassword(), userModelInBase.getPassword())) {

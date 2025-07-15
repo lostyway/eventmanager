@@ -3,7 +3,6 @@ package com.lostway.eventmanager.exception.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.lostway.eventmanager.exception.dto.ErrorMessageResponse;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +24,7 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
     public void handle(HttpServletRequest request,
                        HttpServletResponse response,
                        AccessDeniedException accessDeniedException)
-            throws IOException, ServletException {
+            throws IOException {
         log.error("Handling authentication error", accessDeniedException);
         var error = new ErrorMessageResponse(
                 "Необходима аутентификация",

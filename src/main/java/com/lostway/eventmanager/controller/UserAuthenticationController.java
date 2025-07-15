@@ -3,7 +3,6 @@ package com.lostway.eventmanager.controller;
 import com.lostway.eventmanager.controller.dto.*;
 import com.lostway.eventmanager.exception.UserAlreadyExistException;
 import com.lostway.eventmanager.mapper.UserMapper;
-import com.lostway.eventmanager.security.JWTUtil;
 import com.lostway.eventmanager.service.UserService;
 import com.lostway.eventmanager.service.model.UserModel;
 import jakarta.validation.Valid;
@@ -19,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 public class UserAuthenticationController {
     private final UserService userService;
     private final UserMapper mapper;
-    private final JWTUtil jwtUtil;
 
     @PostMapping
     public ResponseEntity<UserToShowDto> registerUser(@RequestBody @Valid UserRegistryDto userDto) {
