@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 public record ErrorMessageResponse(
         String message,
         String detailedMessage,
-        @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
         LocalDateTime dateTime
 ) {
 }

@@ -2,6 +2,7 @@ package com.lostway.eventmanager.exception.controller;
 
 import com.lostway.eventmanager.exception.*;
 import com.lostway.eventmanager.exception.dto.ErrorMessageResponse;
+import io.jsonwebtoken.JwtException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -137,9 +138,20 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(UsernameNotFoundException.class)
     public ResponseEntity<ErrorMessageResponse> handleUsernameNotFoundException(UsernameNotFoundException e) {
         log.error("Exception handled:", e);
-        return ResponseEntity.badRequest()
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(new ErrorMessageResponse(
                         "Некорректный запрос",
+                        e.getMessage(),
+                        now()
+                ));
+    }
+
+    @ExceptionHandler(JwtException.class)
+    public ResponseEntity<ErrorMessageResponse> handleJwtException(JwtException e) {
+        log.error("Exception handled:", e);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(new ErrorMessageResponse(
+                        "Сущность не найдена",
                         e.getMessage(),
                         now()
                 ));

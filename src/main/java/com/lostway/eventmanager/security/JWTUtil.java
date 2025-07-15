@@ -53,4 +53,15 @@ public class JWTUtil {
             throw new JwtException("Invalid JWT token");
         }
     }
+
+    public void validateToken(String token) {
+        try {
+            Jwts.parserBuilder()
+                    .setSigningKey(secretKey)
+                    .build()
+                    .parseClaimsJws(token);
+        } catch (Exception e) {
+            throw new JwtException("Invalid JWT token");
+        }
+    }
 }

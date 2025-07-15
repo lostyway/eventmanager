@@ -7,7 +7,7 @@ import com.lostway.eventmanager.repository.UserRepository;
 import com.lostway.eventmanager.repository.entity.UserEntity;
 import com.lostway.eventmanager.security.JWTUtil;
 import com.lostway.eventmanager.service.model.UserModel;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.User;
@@ -43,7 +43,7 @@ public class UserService {
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
-    public UserModel getUserById(@NotBlank Long userId) {
+    public UserModel getUserById(@NotNull Long userId) {
         UserEntity entity = userRepository.findById(userId)
                 .orElseThrow(() -> new UsernameNotFoundException("Пользователь не был найден по ID: " + userId));
         return mapper.toModel(entity);
@@ -60,17 +60,20 @@ public class UserService {
         return User.builder()
                 .username(entity.getLogin())
                 .password(entity.getPassword())
-                .roles(entity.getRole().name())
+                .authorities(entity.getRole().name())
                 .build();
     }
 
     public String auth(UserModel model) {
+        //todo поправить на 404 ошибку
         UserModel userModelInBase = findByLogin(model.getLogin());
 
         if (!passwordEncoder.matches(model.getPassword(), userModelInBase.getPassword())) {
             throw new IncorrectPasswordException("Пароль был введен неверно!");
         }
 
-        return jwtUtil.generateToken(model);
+        String token = jwtUtil.generateToken(model);
+        jwtUtil.validateToken(token);
+        return token;
     }
 }
