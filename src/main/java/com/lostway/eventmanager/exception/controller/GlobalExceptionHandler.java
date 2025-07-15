@@ -8,7 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.BindException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -91,17 +90,6 @@ public class GlobalExceptionHandler {
                         now()));
     }
 
-    @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<ErrorMessageResponse> handelAccessDeniedException(AccessDeniedException e) {
-        log.error("Exception handled:", e);
-        return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                .body(new ErrorMessageResponse(
-                        "Недостаточно прав для выполнения операции",
-                        e.getMessage(),
-                        now()
-                ));
-    }
-
     @ExceptionHandler(NoResourceFoundException.class)
     public ResponseEntity<ErrorMessageResponse> handleNoResourceException(NoResourceFoundException e) {
         log.error("Exception handled:", e);
@@ -149,7 +137,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(JwtException.class)
     public ResponseEntity<ErrorMessageResponse> handleJwtException(JwtException e) {
         log.error("Exception handled:", e);
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+        return ResponseEntity.status(401)
                 .body(new ErrorMessageResponse(
                         "Сущность не найдена",
                         e.getMessage(),

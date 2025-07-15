@@ -15,11 +15,14 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
+import static com.lostway.eventmanager.exception.ErrorMsgResponseFilterExceptionUtil.createJsonError;
+
 @Component
 @RequiredArgsConstructor
 public class JWTAuthFilter extends OncePerRequestFilter {
     private final JWTUtil jwtUtil;
     private final UserService userService;
+    private final String errorMessage = "Invalid JWT token";
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -30,7 +33,14 @@ public class JWTAuthFilter extends OncePerRequestFilter {
             String jwt = header.replace("Bearer ", "");
 
             if (jwt.isBlank()) {
-                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid JWT token in Authorization header");
+                logger.warn(errorMessage);
+                String messageToResponse = createJsonError(response,
+                        errorMessage,
+                        "Invalid JWT token in Authorization header",
+                        HttpServletResponse.SC_UNAUTHORIZED
+                );
+                response.getWriter().write(messageToResponse);
+                return;
             } else {
                 try {
                     String username = jwtUtil.validateAndGetUsername(jwt);
@@ -45,7 +55,10 @@ public class JWTAuthFilter extends OncePerRequestFilter {
                         SecurityContextHolder.getContext().setAuthentication(authToken);
                     }
                 } catch (JwtException e) {
-                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid JWT Token");
+                    logger.warn(errorMessage, e);
+                    String messageToResponse = createJsonError(response, errorMessage, e.getMessage(), HttpServletResponse.SC_UNAUTHORIZED);
+                    response.getWriter().write(messageToResponse);
+                    return;
                 }
             }
         }
