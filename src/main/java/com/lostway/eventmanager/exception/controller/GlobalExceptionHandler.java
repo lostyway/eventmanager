@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.BindException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -140,6 +141,17 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(401)
                 .body(new ErrorMessageResponse(
                         "Сущность не найдена",
+                        e.getMessage(),
+                        now()
+                ));
+    }
+
+    @ExceptionHandler(AuthorizationDeniedException.class)
+    public ResponseEntity<ErrorMessageResponse> handleAuthorizationDeniedException(AuthorizationDeniedException e) {
+        log.error("Exception handled:", e);
+        return ResponseEntity.status(401)
+                .body(new ErrorMessageResponse(
+                        "Недостаточно прав для выполнения операции",
                         e.getMessage(),
                         now()
                 ));
