@@ -1,5 +1,6 @@
 package com.lostway.eventmanager.repository.entity;
 
+import com.lostway.eventmanager.audit.AuditableEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -9,9 +10,9 @@ import lombok.*;
 @AllArgsConstructor
 @Getter
 @Setter
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = false)
 @Builder
-public class LocationEntity {
+public class LocationEntity extends AuditableEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

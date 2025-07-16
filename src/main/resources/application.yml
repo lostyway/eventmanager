@@ -15,12 +15,16 @@ spring:
     hibernate:
       ddl-auto: none
     show-sql: true
+    open-in-view: false
 
 logging:
   level:
-    com.lostway.eventmanager: info
     root: info
+    com.lostway.eventmanager.aop: debug
 springdoc:
   swagger-ui:
     url: /openapi.yaml
-secret.key: verylongsecretkeyforpetproject
+secret.key: verylongsecretkeyforpetprojecteventmanagerlostway2025
+
+#In second
+expiration.time: 3600

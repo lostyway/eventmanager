@@ -1,16 +1,15 @@
 package com.lostway.eventmanager.controller;
 
-import com.lostway.eventmanager.controller.dto.UserLoginDto;
-import com.lostway.eventmanager.controller.dto.UserRegistryDto;
-import com.lostway.eventmanager.controller.dto.UserToShowDto;
+import com.lostway.eventmanager.controller.dto.*;
 import com.lostway.eventmanager.exception.UserAlreadyExistException;
 import com.lostway.eventmanager.mapper.UserMapper;
-import com.lostway.eventmanager.security.JwtAuthenticationResponse;
 import com.lostway.eventmanager.service.UserService;
 import com.lostway.eventmanager.service.model.UserModel;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -20,27 +19,29 @@ public class UserAuthenticationController {
     private final UserService userService;
     private final UserMapper mapper;
 
-
     @PostMapping
-    public UserToShowDto registerUser(@RequestBody @Valid UserRegistryDto userDto) {
+    public ResponseEntity<UserToShowDto> registerUser(@RequestBody @Valid UserRegistryDto userDto) {
         if (userService.existsByLogin(userDto.getLogin())) {
             throw new UserAlreadyExistException("Пользователь с логином: " + userDto.getLogin() + " уже существует!");
         }
 
-        //TODO Процесс регистрации
-
         UserModel registeredUserModel = userService.registerUser(mapper.toModel(userDto));
-        return mapper.toUserToShowDto(registeredUserModel);
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(mapper.toUserToShowDto(registeredUserModel));
     }
 
     @PostMapping("/auth")
-    public JwtAuthenticationResponse authenticateUser(@RequestBody @Valid UserLoginDto userToLoginDto) {
-        return null;
+    public ResponseEntity<JwtResponseDto> auth(@RequestBody @Valid UserLoginDto loginDto) {
+        String token = userService.auth(mapper.toModel(loginDto));
+
+        return ResponseEntity.ok(new JwtResponseDto(token));
     }
 
     @GetMapping("/{userId}")
-    public UserToShowDto ById(@PathVariable @NotBlank Long userId) {
+    public ResponseEntity<UserToShowByIdDto> byId(@PathVariable @NotNull Long userId) {
         UserModel model = userService.getUserById(userId);
-        return mapper.toUserToShowDto(model);
+        UserToShowByIdDto userToShowDto = mapper.toUserToShowByIdDto(model);
+        return ResponseEntity.ok(userToShowDto);
     }
 }

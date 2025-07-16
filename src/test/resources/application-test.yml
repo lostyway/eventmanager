@@ -1,0 +1,14 @@
+spring:
+  datasource:
+    username: test
+    password: test
+    hikari:
+      max-lifetime: 1_800_000
+      maximum-pool-size: 20
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+  liquibase:
+    enabled: true
+    change-log: db/changelog/master.xml

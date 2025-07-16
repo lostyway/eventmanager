@@ -1,5 +1,6 @@
 package com.lostway.eventmanager.repository.entity;
 
+import com.lostway.eventmanager.audit.AuditableEntity;
 import com.lostway.eventmanager.enums.EventStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
@@ -11,10 +12,10 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = false)
 @Getter
 @Setter
-public class EventEntity {
+public class EventEntity extends AuditableEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
