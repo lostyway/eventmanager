@@ -160,7 +160,7 @@ public class GlobalExceptionHandler {
         return ex.getBindingResult()
                 .getFieldErrors()
                 .stream()
-                .map(error -> String.format("Поле '%s : %s", error.getField(), error.getDefaultMessage()))
+                .map(error -> String.format("Поле '%s' : %s", error.getField(), error.getDefaultMessage()))
                 .collect(Collectors.joining("; "));
     }
 }

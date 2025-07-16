@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
-import static com.lostway.eventmanager.exception.ErrorMsgResponseFilterExceptionUtil.createJsonError;
+import static com.lostway.eventmanager.exception.ErrorDtoBuilderUtil.createJsonError;
 
 @Slf4j
 @Component

@@ -10,12 +10,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertThrows;
-import org.springframework.security.test.context.support.*;
 
-@WithMockUser(authorities = {"ADMIN"})
 class LocationServiceTest extends IntegrationTestBase {
 
     @Autowired
@@ -124,7 +121,7 @@ class LocationServiceTest extends IntegrationTestBase {
 
         newSecondLocation.setCapacity(1);
         Exception exception = assertThrows(LocationCapacityReductionException.class,
-        () -> service.updateLocation(savedLocation.getId(), newSecondLocation));
+                () -> service.updateLocation(savedLocation.getId(), newSecondLocation));
 
         assertThat(exception).hasMessageContaining("Нельзя уменьшить вместительность локации");
     }

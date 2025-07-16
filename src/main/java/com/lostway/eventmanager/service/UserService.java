@@ -25,7 +25,6 @@ public class UserService {
     private final UserMapper mapper;
     private final JWTUtil jwtUtil;
     private final PasswordEncoder encoder;
-    private final PasswordEncoder passwordEncoder;
 
     @Transactional
     public UserModel registerUser(UserModel model) {
@@ -67,7 +66,7 @@ public class UserService {
     public String auth(UserModel model) {
         UserModel userModelInBase = findByLogin(model.getLogin());
 
-        if (!passwordEncoder.matches(model.getPassword(), userModelInBase.getPassword())) {
+        if (!encoder.matches(model.getPassword(), userModelInBase.getPassword())) {
             throw new IncorrectPasswordException("Пароль был введен неверно!");
         }
 

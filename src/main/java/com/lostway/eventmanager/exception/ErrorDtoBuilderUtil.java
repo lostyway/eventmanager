@@ -14,22 +14,22 @@ import java.time.LocalDateTime;
 
 @Slf4j
 @Component
-public class ErrorMsgResponseFilterExceptionUtil {
+public class ErrorDtoBuilderUtil {
 
     private static final ObjectMapper MAPPER = new ObjectMapper().registerModule(new JavaTimeModule());
 
     /**
      * Устанавливает response под JSON и возвращает ErrorMessageResponse в виде JSON для вывода ошибок в фильтрах
      */
-    
+
     @SneakyThrows
     public static String createJsonError(HttpServletResponse response, String message, String detailedMessage, int status) {
         try {
-            ErrorMessageResponse invalidJwtToken = new ErrorMessageResponse(
+            ErrorMessageResponse errorResponse = new ErrorMessageResponse(
                     message,
                     detailedMessage,
                     LocalDateTime.now());
-            String responseMessage = MAPPER.writeValueAsString(invalidJwtToken);
+            String responseMessage = MAPPER.writeValueAsString(errorResponse);
             response.setStatus(status);
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
             response.setCharacterEncoding("UTF-8");

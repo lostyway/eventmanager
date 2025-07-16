@@ -15,7 +15,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
-import static com.lostway.eventmanager.exception.ErrorMsgResponseFilterExceptionUtil.createJsonError;
+import static com.lostway.eventmanager.exception.ErrorDtoBuilderUtil.createJsonError;
 
 @Component
 @RequiredArgsConstructor
