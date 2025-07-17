@@ -133,17 +133,6 @@ public class EventService {
         validateAndGetEventEntity(eventId).setStatus(EventStatus.CANCELLED);
     }
 
-    /**
-     * Доступно только ADMIN, либо создателю мероприятия.
-     * Т.е. роль из JWT токена должна быть ADMIN, либо userId должен быть равен создателю меропрития.
-     * Учтите то, как можно менять мероприятие.
-     * Валидируйте входные значения, например maxPlaces должно быть больше,
-     * чем уже записанных пользователей, стоимость > 0, длительность > 0 и т.д.
-     *
-     * @param model
-     * @return Event
-     */
-
     public Event updateEvent(Integer eventId, Event model) {
         model.setId(eventId);
         EventEntity oldEntity = validateAndGetEventEntity(eventId);

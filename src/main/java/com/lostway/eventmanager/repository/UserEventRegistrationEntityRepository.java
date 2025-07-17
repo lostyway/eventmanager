@@ -2,7 +2,6 @@ package com.lostway.eventmanager.repository;
 
 import com.lostway.eventmanager.repository.entity.UserEntity;
 import com.lostway.eventmanager.repository.entity.UserEventRegistrationEntity;
-import jakarta.validation.constraints.Positive;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -14,6 +13,4 @@ public interface UserEventRegistrationEntityRepository extends JpaRepository<Use
     Optional<UserEventRegistrationEntity> findByUserIdAndEventId(Long userId, Integer eventId);
 
     List<UserEventRegistrationEntity> findByUser(UserEntity user);
-
-    Optional<UserEventRegistrationEntity> findByEventId(@Positive Integer eventId);
 }
