@@ -10,10 +10,16 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 
+import java.util.List;
+
 @Mapper(componentModel = "spring")
 public interface EventMapper {
 
     Event toModel(EventCreateRequestDto eventCreateRequestDto);
+
+    List<EventDto> toDto(List<Event> events);
+
+    List<Event> toModel(List<EventEntity> events);
 
     @Mapping(target = "ownerId", source = "owner.id")
     @Mapping(target = "locationId", source = "location.id")

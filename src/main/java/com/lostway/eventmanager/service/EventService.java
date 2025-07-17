@@ -14,6 +14,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -38,11 +40,21 @@ public class EventService {
             throw new CapacityNotEnoughException("Мест на локации меньше чем предполагается на мероприятии.");
         }
 
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        Long userId = userService.findByLogin(username).getId();
+        Long userId = getSecurityUserId();
         eventToCreate.setOwnerId(userId);
 
         EventEntity savedEntity = repository.save(mapper.toEntity(eventToCreate));
         return mapper.toModel(savedEntity);
+    }
+
+    @PreAuthorize("hasAuthority('USER')")
+    public List<Event> getUsersEvents() {
+        List<EventEntity> eventEntities = repository.findEventByOwnerId(getSecurityUserId());
+        return mapper.toModel(eventEntities);
+    }
+
+    private Long getSecurityUserId() {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        return userService.findByLogin(username).getId();
     }
 }
