@@ -1,13 +1,17 @@
 package com.lostway.eventmanager.service;
 
-import com.lostway.eventmanager.exception.CapacityNotEnoughException;
-import com.lostway.eventmanager.exception.LocationIsPlannedException;
+import com.lostway.eventmanager.enums.EventStatus;
+import com.lostway.eventmanager.exception.*;
 import com.lostway.eventmanager.mapper.EventMapper;
-import com.lostway.eventmanager.mapper.LocationMapper;
+import com.lostway.eventmanager.mapper.UserMapper;
 import com.lostway.eventmanager.repository.EventRepository;
+import com.lostway.eventmanager.repository.UserEventRegistrationEntityRepository;
 import com.lostway.eventmanager.repository.entity.EventEntity;
+import com.lostway.eventmanager.repository.entity.UserEntity;
+import com.lostway.eventmanager.repository.entity.UserEventRegistrationEntity;
 import com.lostway.eventmanager.service.model.Event;
 import com.lostway.eventmanager.service.model.Location;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -24,8 +28,9 @@ public class EventService {
     private final LocationService locationService;
     private final EventMapper mapper;
     private final UserService userService;
-    private final LocationMapper locationMapper;
     private final EventValidatorService eventValidatorService;
+    private final UserEventRegistrationEntityRepository userEventRegistrationEntityRepository;
+    private final UserMapper userMapper;
 
     @Transactional
     @PreAuthorize("hasAuthority('USER')")
@@ -56,5 +61,30 @@ public class EventService {
     private Long getSecurityUserId() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         return userService.findByLogin(username).getId();
+    }
+
+    @Transactional
+    @PreAuthorize("hasAuthority('USER')")
+    public void registerNewEvent(@Positive Integer eventId) {
+        EventEntity eventEntity = repository.findEventById(eventId)
+                .orElseThrow(() -> new EventNotFoundException("Мероприятие с ID: '%s' не было найдено.".formatted(eventId)));
+
+        UserEntity userEntity = userService.getUserByIdForUser(getSecurityUserId());
+
+        if (!eventEntity.getStatus().equals(EventStatus.WAIT_START)) {
+            throw new EventAlreadyStartedException("Регистрация на мероприятие уже закрыто.");
+        }
+
+        if (userEventRegistrationEntityRepository.existsByUserIdAndEventId(userEntity.getId(), eventId)) {
+            throw new AlreadyRegisteredException("Пользователь уже зарегистрирован на это мероприятие.");
+        }
+
+        UserEventRegistrationEntity registration = new UserEventRegistrationEntity();
+        registration.setUser(userEntity);
+        registration.setEvent(eventEntity);
+        userEventRegistrationEntityRepository.save(registration);
+
+        eventEntity.setOccupiedPlaces(eventEntity.getOccupiedPlaces() + 1);
+        repository.save(eventEntity);
     }
 }

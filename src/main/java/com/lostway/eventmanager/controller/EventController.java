@@ -6,6 +6,7 @@ import com.lostway.eventmanager.mapper.EventMapper;
 import com.lostway.eventmanager.service.EventService;
 import com.lostway.eventmanager.service.model.Event;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,5 +34,11 @@ public class EventController {
         List<Event> eventsModels = eventService.getUsersEvents();
         List<EventDto> events = mapper.toDto(eventsModels);
         return ResponseEntity.ok(events);
+    }
+
+    @PostMapping("/registrations/{eventId}")
+    public ResponseEntity<String> registerNewEvent(@PathVariable @Positive Integer eventId) {
+        eventService.registerNewEvent(eventId);
+        return ResponseEntity.status(HttpStatus.OK).body("Успешная регистрация на мероприятие");
     }
 }

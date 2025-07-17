@@ -91,6 +91,36 @@ public class GlobalExceptionHandler {
                         now()));
     }
 
+    @ExceptionHandler(EventNotFoundException.class)
+    public ResponseEntity<ErrorMessageResponse> handelEventNotFoundException(EventNotFoundException e) {
+        log.error("Exception handled:", e);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(new ErrorMessageResponse(
+                        "Мероприятие не было найдено.",
+                        e.getMessage(),
+                        now()));
+    }
+
+    @ExceptionHandler(EventAlreadyStartedException.class)
+    public ResponseEntity<ErrorMessageResponse> handelEventAlreadyStartedException(EventAlreadyStartedException e) {
+        log.error("Exception handled:", e);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ErrorMessageResponse(
+                        "Регистрация на мероприятие завершено.",
+                        e.getMessage(),
+                        now()));
+    }
+
+    @ExceptionHandler(AlreadyRegisteredException.class)
+    public ResponseEntity<ErrorMessageResponse> handelAlreadyRegisteredException(AlreadyRegisteredException e) {
+        log.error("Exception handled:", e);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorMessageResponse(
+                        "Пользователь уже зарегистрирован на участие.",
+                        e.getMessage(),
+                        now()));
+    }
+
     @ExceptionHandler(NoResourceFoundException.class)
     public ResponseEntity<ErrorMessageResponse> handleNoResourceException(NoResourceFoundException e) {
         log.error("Exception handled:", e);

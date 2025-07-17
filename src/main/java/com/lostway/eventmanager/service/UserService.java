@@ -74,4 +74,9 @@ public class UserService {
         jwtUtil.validateToken(token);
         return token;
     }
+
+    public UserEntity getUserByIdForUser(@NotNull Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new UsernameNotFoundException("Пользователь не был найден по ID: " + userId));
+    }
 }
