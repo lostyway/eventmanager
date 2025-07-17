@@ -13,7 +13,7 @@ public record EventDto(
         @NotNull Integer maxPlaces,
         @NotNull Integer occupiedPlaces,
         @Future @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") LocalDateTime date,
-        @NotNull @PositiveOrZero int cost,
+        @NotNull @Positive int cost,
         @NotNull @Min(30) Integer duration,
         @NotNull Integer locationId,
         EventStatus status

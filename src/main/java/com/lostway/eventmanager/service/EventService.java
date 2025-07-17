@@ -3,9 +3,12 @@ package com.lostway.eventmanager.service;
 import com.lostway.eventmanager.enums.EventStatus;
 import com.lostway.eventmanager.exception.*;
 import com.lostway.eventmanager.mapper.EventMapper;
+import com.lostway.eventmanager.mapper.LocationMapper;
 import com.lostway.eventmanager.repository.EventRepository;
+import com.lostway.eventmanager.repository.LocationRepository;
 import com.lostway.eventmanager.repository.UserEventRegistrationEntityRepository;
 import com.lostway.eventmanager.repository.entity.EventEntity;
+import com.lostway.eventmanager.repository.entity.LocationEntity;
 import com.lostway.eventmanager.repository.entity.UserEntity;
 import com.lostway.eventmanager.repository.entity.UserEventRegistrationEntity;
 import com.lostway.eventmanager.service.model.Event;
@@ -26,16 +29,21 @@ import java.util.Objects;
 public class EventService {
     private final EventRepository repository;
     private final LocationService locationService;
+    private final LocationRepository locationRepository;
     private final EventMapper mapper;
     private final UserService userService;
     private final EventValidatorService eventValidatorService;
     private final UserEventRegistrationEntityRepository userEventRegistrationEntityRepository;
+    private final LocationMapper locationMapper;
 
     public Event createNewEvent(Event eventToCreate) {
         Location location = locationService.findById(eventToCreate.getLocationId());
 
         if (eventValidatorService.isLocationPlanned(location)) {
-            throw new LocationIsPlannedException("Локация уже занята другим мероприятием");
+            EventEntity event = repository.findEventByLocation(locationMapper.toEntity(location));
+            if (event.getStatus() != EventStatus.CANCELLED) {
+                throw new LocationIsPlannedException("Локация уже занята другим мероприятием");
+            }
         }
 
         if (location.getCapacity() < eventToCreate.getMaxPlaces()) {
@@ -61,7 +69,7 @@ public class EventService {
 
     public void registerNewEvent(@Positive Integer eventId) {
         EventEntity eventEntity = repository.findEventById(eventId)
-                .orElseThrow(() -> new EventNotFoundException("Мероприятие с ID: '%s' не было найдено.".formatted(eventId)));
+                .orElseThrow(() -> new EventNotFoundException(eventId));
 
         UserEntity userEntity = userService.getUserByIdForUser(getSecurityUserId());
 
@@ -73,18 +81,24 @@ public class EventService {
             throw new AlreadyRegisteredException("Пользователь уже зарегистрирован на это мероприятие.");
         }
 
+        int placeToBuy = eventEntity.getOccupiedPlaces() + 1;
+
+        if (placeToBuy > eventEntity.getMaxPlaces() || placeToBuy > eventEntity.getLocation().getCapacity()) {
+            throw new NotEnoughPlaceException("Недостаточно мест на мероприятии для бронирования");
+        }
+
         UserEventRegistrationEntity registration = new UserEventRegistrationEntity();
         registration.setUser(userEntity);
         registration.setEvent(eventEntity);
-        userEventRegistrationEntityRepository.save(registration);
 
-        eventEntity.setOccupiedPlaces(eventEntity.getOccupiedPlaces() + 1);
+        eventEntity.setOccupiedPlaces(placeToBuy);
+        userEventRegistrationEntityRepository.save(registration);
         repository.save(eventEntity);
     }
 
     public void deleteEventRegistration(@Positive Integer eventId) {
         EventEntity eventEntity = repository.findEventById(eventId)
-                .orElseThrow(() -> new EventNotFoundException("Мероприятие с ID: '%s' не было найдено.".formatted(eventId)));
+                .orElseThrow(() -> new EventNotFoundException(eventId));
 
         UserEntity userEntity = userService.getUserByIdForUser(getSecurityUserId());
 
@@ -93,7 +107,7 @@ public class EventService {
         }
 
         UserEventRegistrationEntity registrationToDelete = userEventRegistrationEntityRepository.findByUserIdAndEventId(userEntity.getId(), eventId)
-                .orElseThrow(() -> new UserNotMemberException("Пользователь не является участником мероприятия."));
+                .orElseThrow(UserNotMemberException::new);
 
         userEventRegistrationEntityRepository.delete(registrationToDelete);
 
@@ -111,18 +125,61 @@ public class EventService {
 
     public Event getEventById(@Positive Integer eventId) {
         EventEntity event = repository.findEventById(eventId)
-                .orElseThrow(() -> new EventNotFoundException("Мероприятие не было найдено."));
+                .orElseThrow(() -> new EventNotFoundException(eventId));
         return mapper.toModel(event);
     }
 
     public void cancelEventById(@Positive Integer eventId) {
+        validateAndGetEventEntity(eventId).setStatus(EventStatus.CANCELLED);
+    }
+
+    /**
+     * Доступно только ADMIN, либо создателю мероприятия.
+     * Т.е. роль из JWT токена должна быть ADMIN, либо userId должен быть равен создателю меропрития.
+     * Учтите то, как можно менять мероприятие.
+     * Валидируйте входные значения, например maxPlaces должно быть больше,
+     * чем уже записанных пользователей, стоимость > 0, длительность > 0 и т.д.
+     *
+     * @param model
+     * @return Event
+     */
+
+    public Event updateEvent(Integer eventId, Event model) {
+        model.setId(eventId);
+        EventEntity oldEntity = validateAndGetEventEntity(eventId);
+        LocationEntity location = locationService.getLocationFromDb(model.getLocationId());
+        UserEntity userEntity = userService.getUserByIdForUser(getSecurityUserId());
+
+        EventEntity newEntity = mapper.toEntity(model);
+        newEntity.setOwner(userEntity);
+        newEntity.setLocation(location);
+
+        validateNewEventFields(oldEntity, newEntity);
+
+        EventEntity saved = repository.save(newEntity);
+        return mapper.toModel(saved);
+    }
+
+    private static void validateNewEventFields(EventEntity oldEntity, EventEntity newEntity) {
+        int occupiedPlaces = oldEntity.getOccupiedPlaces();
+
+        if (newEntity.getMaxPlaces() < occupiedPlaces) {
+            throw new NotEnoughPlaceException("На новом мероприятии мест меньше, чем записанных гостей.");
+        }
+
+        if (newEntity.getLocation().getCapacity() < occupiedPlaces) {
+            throw new NotEnoughPlaceException("На новой локации мест меньше, чем записанных гостей.");
+        }
+    }
+
+    private EventEntity validateAndGetEventEntity(Integer eventId) {
         EventEntity eventEntity = repository.findEventById(eventId)
-                .orElseThrow(() -> new EventNotFoundException("Мероприятие для отмены не было найдено."));
+                .orElseThrow(() -> new EventNotFoundException(eventId));
 
         if (!Objects.equals(getSecurityUserId(), eventEntity.getOwner().getId())) {
             throw new AuthorizationDeniedException("Вы не являетесь создателем мероприятия.");
         }
 
-        eventEntity.setStatus(EventStatus.CANCELLED);
+        return eventEntity;
     }
 }

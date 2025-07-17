@@ -25,4 +25,6 @@ public interface EventRepository extends JpaRepository<EventEntity, Integer> {
     Optional<EventEntity> findEventById(@Param("eventId") Integer id);
 
     boolean existsById(@Positive Integer eventId);
+
+    EventEntity findEventByLocation(LocationEntity entity);
 }

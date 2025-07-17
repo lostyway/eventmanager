@@ -2,6 +2,7 @@ package com.lostway.eventmanager.controller;
 
 import com.lostway.eventmanager.controller.dto.EventCreateRequestDto;
 import com.lostway.eventmanager.controller.dto.EventDto;
+import com.lostway.eventmanager.controller.dto.EventUpdateRequestDto;
 import com.lostway.eventmanager.mapper.EventMapper;
 import com.lostway.eventmanager.service.EventService;
 import com.lostway.eventmanager.service.model.Event;
@@ -65,5 +66,12 @@ public class EventController {
     public ResponseEntity<Void> deleteEventById(@PathVariable @Positive Integer eventId) {
         eventService.cancelEventById(eventId);
         return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/{eventId}")
+    public ResponseEntity<EventDto> updateEvent(@RequestBody @Valid EventUpdateRequestDto eventUpdateRequestDto, @PathVariable @Positive Integer eventId) {
+        Event newEvent = eventService.updateEvent(eventId, mapper.toModel(eventUpdateRequestDto));
+        EventDto result = mapper.toDto(newEvent);
+        return ResponseEntity.ok(result);
     }
 }

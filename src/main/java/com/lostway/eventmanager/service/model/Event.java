@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 
 @Data
 public class Event {
-    private Long id;
+    private Integer id;
 
     private String name;
 

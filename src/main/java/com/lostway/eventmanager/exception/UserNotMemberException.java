@@ -4,4 +4,8 @@ public class UserNotMemberException extends RuntimeException {
     public UserNotMemberException(String message) {
         super(message);
     }
+
+    public UserNotMemberException() {
+        super("Пользователь не является участником мероприятия.");
+    }
 }

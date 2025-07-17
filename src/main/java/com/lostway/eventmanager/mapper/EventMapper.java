@@ -2,6 +2,7 @@ package com.lostway.eventmanager.mapper;
 
 import com.lostway.eventmanager.controller.dto.EventCreateRequestDto;
 import com.lostway.eventmanager.controller.dto.EventDto;
+import com.lostway.eventmanager.controller.dto.EventUpdateRequestDto;
 import com.lostway.eventmanager.repository.entity.EventEntity;
 import com.lostway.eventmanager.repository.entity.LocationEntity;
 import com.lostway.eventmanager.repository.entity.UserEntity;
@@ -50,4 +51,6 @@ public interface EventMapper {
         location.setId(locationId);
         return location;
     }
+
+    Event toModel(EventUpdateRequestDto eventUpdateRequestDto);
 }

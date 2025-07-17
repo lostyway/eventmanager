@@ -82,4 +82,10 @@ public class LocationService {
 
         return mapper.toModel(repository.save(toSave));
     }
+
+    @Transactional
+    public LocationEntity getLocationFromDb(Integer locationId) {
+        return repository.findById(locationId)
+                .orElseThrow(() -> new LocationNotFoundException("Локация не найдена"));
+    }
 }

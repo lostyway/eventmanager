@@ -28,7 +28,29 @@ import static java.time.LocalDateTime.now;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(LocationNotFoundException.class)
+    @ExceptionHandler({
+            NotEnoughPlaceException.class,
+            UserAlreadyExistException.class,
+            IncorrectPasswordException.class,
+            UsernameNotFoundException.class,
+            CapacityNotEnoughException.class,
+            UserNotMemberException.class,
+            AlreadyRegisteredException.class,
+            EventNotFoundException.class
+    })
+    public ResponseEntity<ErrorMessageResponse> handelNotEnoughPlaceException(RuntimeException e) {
+        log.error("Exception handled:", e);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorMessageResponse(
+                        "Некорректный запрос",
+                        e.getMessage(),
+                        now()));
+    }
+
+    @ExceptionHandler({
+            LocationNotFoundException.class,
+            EntityNotFoundException.class
+    })
     public ResponseEntity<ErrorMessageResponse> handelLocationNotFoundException(LocationNotFoundException e) {
         log.error("Exception handled:", e);
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -54,16 +76,6 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest()
                 .body(new ErrorMessageResponse(
                         "Ошибка изменения вместимости локации",
-                        e.getMessage(),
-                        now()));
-    }
-
-    @ExceptionHandler(EntityNotFoundException.class)
-    public ResponseEntity<ErrorMessageResponse> handelEntityNotFoundException(EntityNotFoundException e) {
-        log.error("Exception handled:", e);
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(new ErrorMessageResponse(
-                        "Сущность не была найдена",
                         e.getMessage(),
                         now()));
     }
@@ -108,16 +120,6 @@ public class GlobalExceptionHandler {
                         now()));
     }
 
-    @ExceptionHandler(EventNotFoundException.class)
-    public ResponseEntity<ErrorMessageResponse> handelEventNotFoundException(EventNotFoundException e) {
-        log.error("Exception handled:", e);
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(new ErrorMessageResponse(
-                        "Мероприятие не было найдено.",
-                        e.getMessage(),
-                        now()));
-    }
-
     @ExceptionHandler(EventAlreadyStartedException.class)
     public ResponseEntity<ErrorMessageResponse> handelEventAlreadyStartedException(EventAlreadyStartedException e) {
         log.error("Exception handled:", e);
@@ -128,55 +130,12 @@ public class GlobalExceptionHandler {
                         now()));
     }
 
-    @ExceptionHandler(AlreadyRegisteredException.class)
-    public ResponseEntity<ErrorMessageResponse> handelAlreadyRegisteredException(AlreadyRegisteredException e) {
-        log.error("Exception handled:", e);
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(new ErrorMessageResponse(
-                        "Пользователь уже зарегистрирован на участие.",
-                        e.getMessage(),
-                        now()));
-    }
-
     @ExceptionHandler(NoResourceFoundException.class)
     public ResponseEntity<ErrorMessageResponse> handleNoResourceException(NoResourceFoundException e) {
         log.error("Exception handled:", e);
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(new ErrorMessageResponse(
                         "Данный адрес не был найден",
-                        e.getMessage(),
-                        now()
-                ));
-    }
-
-    @ExceptionHandler(UserAlreadyExistException.class)
-    public ResponseEntity<ErrorMessageResponse> handleUserAlreadyExistException(UserAlreadyExistException e) {
-        log.error("Exception handled:", e);
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(new ErrorMessageResponse(
-                        "Некорректный запрос",
-                        e.getMessage(),
-                        now()
-                ));
-    }
-
-    @ExceptionHandler(IncorrectPasswordException.class)
-    public ResponseEntity<ErrorMessageResponse> handleIncorrectPasswordException(IncorrectPasswordException e) {
-        log.error("Exception handled:", e);
-        return ResponseEntity.badRequest()
-                .body(new ErrorMessageResponse(
-                        "Некорректный запрос",
-                        e.getMessage(),
-                        now()
-                ));
-    }
-
-    @ExceptionHandler(UsernameNotFoundException.class)
-    public ResponseEntity<ErrorMessageResponse> handleUsernameNotFoundException(UsernameNotFoundException e) {
-        log.error("Exception handled:", e);
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(new ErrorMessageResponse(
-                        "Некорректный запрос",
                         e.getMessage(),
                         now()
                 ));
@@ -199,28 +158,6 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(403)
                 .body(new ErrorMessageResponse(
                         "Недостаточно прав для выполнения операции",
-                        e.getMessage(),
-                        now()
-                ));
-    }
-
-    @ExceptionHandler(CapacityNotEnoughException.class)
-    public ResponseEntity<ErrorMessageResponse> handleCapacityNotEnoughException(CapacityNotEnoughException e) {
-        log.error("Exception handled:", e);
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(new ErrorMessageResponse(
-                        "Некорректный запрос",
-                        e.getMessage(),
-                        now()
-                ));
-    }
-
-    @ExceptionHandler(UserNotMemberException.class)
-    public ResponseEntity<ErrorMessageResponse> handleUserNotMemberException(UserNotMemberException e) {
-        log.error("Exception handled:", e);
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(new ErrorMessageResponse(
-                        "Некорректный запрос",
                         e.getMessage(),
                         now()
                 ));
