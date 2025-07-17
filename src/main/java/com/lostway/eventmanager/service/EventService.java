@@ -81,4 +81,25 @@ public class EventService {
         eventEntity.setOccupiedPlaces(eventEntity.getOccupiedPlaces() + 1);
         repository.save(eventEntity);
     }
+
+    @Transactional
+    public void deleteEventRegistration(@Positive Integer eventId) {
+        EventEntity eventEntity = repository.findEventById(eventId)
+                .orElseThrow(() -> new EventNotFoundException("Мероприятие с ID: '%s' не было найдено.".formatted(eventId)));
+
+        UserEntity userEntity = userService.getUserByIdForUser(getSecurityUserId());
+
+        if (!eventEntity.getStatus().equals(EventStatus.WAIT_START)) {
+            throw new EventAlreadyStartedException("Регистрация на мероприятие уже закрыто. Отменить регистрацию не получится.");
+        }
+
+        UserEventRegistrationEntity registrationToDelete = userEventRegistrationEntityRepository.findByUserIdAndEventId(userEntity.getId(), eventId)
+                .orElseThrow(() -> new UserNotMemberException("Пользователь не является участником мероприятия."));
+
+        userEventRegistrationEntityRepository.delete(registrationToDelete);
+
+        int occupiedPlaces = Math.max(0, eventEntity.getOccupiedPlaces() - 1);
+        eventEntity.setOccupiedPlaces(occupiedPlaces);
+        repository.save(eventEntity);
+    }
 }

@@ -24,7 +24,7 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
         String stringResponse = createJsonError(response,
                 "Недостаточно прав для выполнения операции",
                 accessDeniedException.getMessage(),
-                HttpServletResponse.SC_UNAUTHORIZED
+                HttpServletResponse.SC_FORBIDDEN
         );
         response.getWriter().write(stringResponse);
     }

@@ -41,4 +41,10 @@ public class EventController {
         eventService.registerNewEvent(eventId);
         return ResponseEntity.status(HttpStatus.OK).body("Успешная регистрация на мероприятие");
     }
+
+    @DeleteMapping("/registrations/cancel/{eventId}")
+    public ResponseEntity<String> cancelEvent(@PathVariable @Positive Integer eventId) {
+        eventService.deleteEventRegistration(eventId);
+        return ResponseEntity.noContent().build();
+    }
 }

@@ -14,8 +14,12 @@ import org.springframework.validation.BindException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import static java.time.LocalDateTime.now;
@@ -72,6 +76,19 @@ public class GlobalExceptionHandler {
                         "Данные сущности введены некорректно",
                         getDetailedMessage(e),
                         now()));
+    }
+
+    @ExceptionHandler(HandlerMethodValidationException.class)
+    public ResponseEntity<ErrorMessageResponse> handleValidationException(HandlerMethodValidationException ex) {
+        List<String> details = getDetails(ex);
+
+        ErrorMessageResponse response = ErrorMessageResponse.builder()
+                .message("Ошибка валидации параметров")
+                .detailedMessage(String.join("; ", details))
+                .dateTime(LocalDateTime.now())
+                .build();
+
+        return ResponseEntity.badRequest().body(response);
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
@@ -198,6 +215,17 @@ public class GlobalExceptionHandler {
                 ));
     }
 
+    @ExceptionHandler(UserNotMemberException.class)
+    public ResponseEntity<ErrorMessageResponse> handleUserNotMemberException(UserNotMemberException e) {
+        log.error("Exception handled:", e);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorMessageResponse(
+                        "Некорректный запрос",
+                        e.getMessage(),
+                        now()
+                ));
+    }
+
     @ExceptionHandler(Throwable.class)
     public ResponseEntity<ErrorMessageResponse> handleAllException(Throwable e) {
         log.error("Exception handled:", e);
@@ -215,5 +243,14 @@ public class GlobalExceptionHandler {
                 .stream()
                 .map(error -> String.format("Поле '%s' : %s", error.getField(), error.getDefaultMessage()))
                 .collect(Collectors.joining("; "));
+    }
+
+    private static List<String> getDetails(HandlerMethodValidationException ex) {
+        List<String> details = ex.getParameterValidationResults().stream()
+                .flatMap(r -> r.getResolvableErrors().stream())
+                .map(error -> String.format("Field: %s, Message: %s",
+                        Arrays.toString(error.getArguments()), error.getDefaultMessage()))
+                .toList();
+        return details;
     }
 }
