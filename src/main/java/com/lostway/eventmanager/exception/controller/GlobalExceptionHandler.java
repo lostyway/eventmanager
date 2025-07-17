@@ -179,7 +179,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(AuthorizationDeniedException.class)
     public ResponseEntity<ErrorMessageResponse> handleAuthorizationDeniedException(AuthorizationDeniedException e) {
         log.error("Exception handled:", e);
-        return ResponseEntity.status(401)
+        return ResponseEntity.status(403)
                 .body(new ErrorMessageResponse(
                         "Недостаточно прав для выполнения операции",
                         e.getMessage(),

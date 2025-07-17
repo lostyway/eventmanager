@@ -3,7 +3,6 @@ package com.lostway.eventmanager.service;
 import com.lostway.eventmanager.enums.EventStatus;
 import com.lostway.eventmanager.exception.*;
 import com.lostway.eventmanager.mapper.EventMapper;
-import com.lostway.eventmanager.mapper.UserMapper;
 import com.lostway.eventmanager.repository.EventRepository;
 import com.lostway.eventmanager.repository.UserEventRegistrationEntityRepository;
 import com.lostway.eventmanager.repository.entity.EventEntity;
@@ -13,7 +12,6 @@ import com.lostway.eventmanager.service.model.Event;
 import com.lostway.eventmanager.service.model.Location;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,10 +28,8 @@ public class EventService {
     private final UserService userService;
     private final EventValidatorService eventValidatorService;
     private final UserEventRegistrationEntityRepository userEventRegistrationEntityRepository;
-    private final UserMapper userMapper;
 
     @Transactional
-    @PreAuthorize("hasAuthority('USER')")
     public Event createNewEvent(Event eventToCreate) {
         Location location = locationService.findById(eventToCreate.getLocationId());
 
@@ -52,7 +48,6 @@ public class EventService {
         return mapper.toModel(savedEntity);
     }
 
-    @PreAuthorize("hasAuthority('USER')")
     public List<Event> getUsersEvents() {
         List<EventEntity> eventEntities = repository.findEventByOwnerId(getSecurityUserId());
         return mapper.toModel(eventEntities);
@@ -64,7 +59,6 @@ public class EventService {
     }
 
     @Transactional
-    @PreAuthorize("hasAuthority('USER')")
     public void registerNewEvent(@Positive Integer eventId) {
         EventEntity eventEntity = repository.findEventById(eventId)
                 .orElseThrow(() -> new EventNotFoundException("Мероприятие с ID: '%s' не было найдено.".formatted(eventId)));
