@@ -46,7 +46,7 @@
                 name            text,
                 owner_id        int references users (id),
                 max_places      int       not null,
-                occupied_places int       not null,
+                occupied_places int,
                 date            timestamp not null,
                 cost            decimal   not null,
                 duration        int       not null,
@@ -81,6 +81,19 @@
             alter table users
                 add column last_modified_by text;
             alter table users
+                add column last_modified_at timestamp;
+        </sql>
+    </changeSet>
+    <changeSet id="006" author="lostway">
+        <comment>Добавление аудита для таблицы events</comment>
+        <sql>
+            alter table events
+                add column created_by text;
+            alter table events
+                add column created_at timestamp;
+            alter table events
+                add column last_modified_by text;
+            alter table events
                 add column last_modified_at timestamp;
         </sql>
     </changeSet>

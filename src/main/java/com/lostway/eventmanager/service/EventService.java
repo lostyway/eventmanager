@@ -1,16 +1,48 @@
 package com.lostway.eventmanager.service;
 
+import com.lostway.eventmanager.exception.CapacityNotEnoughException;
+import com.lostway.eventmanager.exception.LocationIsPlannedException;
+import com.lostway.eventmanager.mapper.EventMapper;
+import com.lostway.eventmanager.mapper.LocationMapper;
 import com.lostway.eventmanager.repository.EventRepository;
-import com.lostway.eventmanager.repository.entity.LocationEntity;
+import com.lostway.eventmanager.repository.entity.EventEntity;
+import com.lostway.eventmanager.service.model.Event;
+import com.lostway.eventmanager.service.model.Location;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class EventService {
     private final EventRepository repository;
+    private final LocationService locationService;
+    private final EventMapper mapper;
+    private final UserService userService;
+    private final LocationMapper locationMapper;
+    private final EventValidatorService eventValidatorService;
 
-    public boolean isLocationPlanned(LocationEntity locationEntity) {
-        return repository.existsEventEntitiesByLocation(locationEntity);
+    @Transactional
+    @PreAuthorize("hasAuthority('USER')")
+    public Event createNewEvent(Event eventToCreate) {
+        Location location = locationService.findById(eventToCreate.getLocationId());
+
+        if (eventValidatorService.isLocationPlanned(location)) {
+            throw new LocationIsPlannedException("Локация уже занята другим мероприятием");
+        }
+
+        if (location.getCapacity() < eventToCreate.getMaxPlaces()) {
+            throw new CapacityNotEnoughException("Мест на локации меньше чем предполагается на мероприятии.");
+        }
+
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        Long userId = userService.findByLogin(username).getId();
+        eventToCreate.setOwnerId(userId);
+
+        EventEntity savedEntity = repository.save(mapper.toEntity(eventToCreate));
+        return mapper.toModel(savedEntity);
     }
 }

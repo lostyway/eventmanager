@@ -157,6 +157,17 @@ public class GlobalExceptionHandler {
                 ));
     }
 
+    @ExceptionHandler(CapacityNotEnoughException.class)
+    public ResponseEntity<ErrorMessageResponse> handleCapacityNotEnoughException(CapacityNotEnoughException e) {
+        log.error("Exception handled:", e);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorMessageResponse(
+                        "Некорректный запрос",
+                        e.getMessage(),
+                        now()
+                ));
+    }
+
     @ExceptionHandler(Throwable.class)
     public ResponseEntity<ErrorMessageResponse> handleAllException(Throwable e) {
         log.error("Exception handled:", e);

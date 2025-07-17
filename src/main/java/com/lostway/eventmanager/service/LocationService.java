@@ -20,7 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class LocationService {
     private final LocationMapper mapper;
     private final LocationRepository repository;
-    private final EventService eventService;
+    private final EventValidatorService eventValidatorService;
 
     @Transactional(readOnly = true)
     @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('USER')")
@@ -54,7 +54,7 @@ public class LocationService {
         LocationEntity locationEntity = repository.findById(locationId)
                 .orElseThrow(() -> new LocationNotFoundException("Локация с ID: '%s' не была найдена".formatted(locationId)));
 
-        if (isLocationPlanned(locationEntity)) {
+        if (eventValidatorService.isLocationPlanned(mapper.toModel(locationEntity))) {
             throw new LocationIsPlannedException("Локация уже занята мероприятием");
         }
 
@@ -62,10 +62,6 @@ public class LocationService {
         repository.delete(locationEntity);
 
         return location;
-    }
-
-    private boolean isLocationPlanned(LocationEntity locationEntity) {
-        return eventService.isLocationPlanned(locationEntity);
     }
 
     @Transactional
