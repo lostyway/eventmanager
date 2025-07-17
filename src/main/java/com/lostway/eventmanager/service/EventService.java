@@ -12,15 +12,17 @@ import com.lostway.eventmanager.service.model.Event;
 import com.lostway.eventmanager.service.model.Location;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+@Transactional
 public class EventService {
     private final EventRepository repository;
     private final LocationService locationService;
@@ -29,7 +31,6 @@ public class EventService {
     private final EventValidatorService eventValidatorService;
     private final UserEventRegistrationEntityRepository userEventRegistrationEntityRepository;
 
-    @Transactional
     public Event createNewEvent(Event eventToCreate) {
         Location location = locationService.findById(eventToCreate.getLocationId());
 
@@ -58,7 +59,6 @@ public class EventService {
         return userService.findByLogin(username).getId();
     }
 
-    @Transactional
     public void registerNewEvent(@Positive Integer eventId) {
         EventEntity eventEntity = repository.findEventById(eventId)
                 .orElseThrow(() -> new EventNotFoundException("Мероприятие с ID: '%s' не было найдено.".formatted(eventId)));
@@ -82,7 +82,6 @@ public class EventService {
         repository.save(eventEntity);
     }
 
-    @Transactional
     public void deleteEventRegistration(@Positive Integer eventId) {
         EventEntity eventEntity = repository.findEventById(eventId)
                 .orElseThrow(() -> new EventNotFoundException("Мероприятие с ID: '%s' не было найдено.".formatted(eventId)));
@@ -101,5 +100,29 @@ public class EventService {
         int occupiedPlaces = Math.max(0, eventEntity.getOccupiedPlaces() - 1);
         eventEntity.setOccupiedPlaces(occupiedPlaces);
         repository.save(eventEntity);
+    }
+
+    public List<Event> getUserRegistrationsOnEvents() {
+        UserEntity userEntity = userService.getUserByIdForUser(getSecurityUserId());
+        List<UserEventRegistrationEntity> registrations = userEventRegistrationEntityRepository.findByUser(userEntity);
+        List<EventEntity> list = registrations.stream().map(UserEventRegistrationEntity::getEvent).toList();
+        return mapper.toModel(list);
+    }
+
+    public Event getEventById(@Positive Integer eventId) {
+        EventEntity event = repository.findEventById(eventId)
+                .orElseThrow(() -> new EventNotFoundException("Мероприятие не было найдено."));
+        return mapper.toModel(event);
+    }
+
+    public void cancelEventById(@Positive Integer eventId) {
+        EventEntity eventEntity = repository.findEventById(eventId)
+                .orElseThrow(() -> new EventNotFoundException("Мероприятие для отмены не было найдено."));
+
+        if (!Objects.equals(getSecurityUserId(), eventEntity.getOwner().getId())) {
+            throw new AuthorizationDeniedException("Вы не являетесь создателем мероприятия.");
+        }
+
+        eventEntity.setStatus(EventStatus.CANCELLED);
     }
 }

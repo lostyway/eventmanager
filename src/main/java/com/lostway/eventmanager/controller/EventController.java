@@ -47,4 +47,23 @@ public class EventController {
         eventService.deleteEventRegistration(eventId);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/registrations/my")
+    public ResponseEntity<List<EventDto>> getUserRegistrations() {
+        List<Event> events = eventService.getUserRegistrationsOnEvents();
+        return ResponseEntity.ok(mapper.toDto(events));
+    }
+
+    @GetMapping("/{eventId}")
+    public ResponseEntity<EventDto> getEventById(@PathVariable @Positive Integer eventId) {
+        Event event = eventService.getEventById(eventId);
+        EventDto result = mapper.toDto(event);
+        return ResponseEntity.ok(result);
+    }
+
+    @DeleteMapping("/{eventId}")
+    public ResponseEntity<Void> deleteEventById(@PathVariable @Positive Integer eventId) {
+        eventService.cancelEventById(eventId);
+        return ResponseEntity.noContent().build();
+    }
 }

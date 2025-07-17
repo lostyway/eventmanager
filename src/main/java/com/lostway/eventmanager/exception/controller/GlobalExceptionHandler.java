@@ -246,11 +246,10 @@ public class GlobalExceptionHandler {
     }
 
     private static List<String> getDetails(HandlerMethodValidationException ex) {
-        List<String> details = ex.getParameterValidationResults().stream()
+        return ex.getParameterValidationResults().stream()
                 .flatMap(r -> r.getResolvableErrors().stream())
                 .map(error -> String.format("Field: %s, Message: %s",
                         Arrays.toString(error.getArguments()), error.getDefaultMessage()))
                 .toList();
-        return details;
     }
 }
