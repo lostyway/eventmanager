@@ -35,7 +35,7 @@ public class EventEntity extends AuditableEntity {
     private Integer maxPlaces;
 
     @Column(name = "occupied_places")
-    private int occupiedPlaces;
+    private Integer occupiedPlaces;
 
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime date;

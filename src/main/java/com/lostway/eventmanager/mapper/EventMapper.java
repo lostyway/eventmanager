@@ -15,7 +15,7 @@ import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface EventMapper {
-
+    
     Event toModel(EventCreateRequestDto eventCreateRequestDto);
 
     List<EventDto> toDto(List<Event> events);

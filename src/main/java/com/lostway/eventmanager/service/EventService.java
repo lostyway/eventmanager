@@ -1,5 +1,6 @@
 package com.lostway.eventmanager.service;
 
+import com.lostway.eventmanager.controller.dto.EventSearchRequestDto;
 import com.lostway.eventmanager.enums.EventStatus;
 import com.lostway.eventmanager.exception.*;
 import com.lostway.eventmanager.mapper.EventMapper;
@@ -147,6 +148,11 @@ public class EventService {
 
         EventEntity saved = repository.save(newEntity);
         return mapper.toModel(saved);
+    }
+
+    public List<Event> searchEventByFilter(EventSearchRequestDto eventSearchRequestDto) {
+        List<EventEntity> entityList = repository.parseAndFindByFilter(eventSearchRequestDto);
+        return mapper.toModel(entityList);
     }
 
     private static void validateNewEventFields(EventEntity oldEntity, EventEntity newEntity) {

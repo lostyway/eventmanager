@@ -2,6 +2,7 @@ package com.lostway.eventmanager.controller;
 
 import com.lostway.eventmanager.controller.dto.EventCreateRequestDto;
 import com.lostway.eventmanager.controller.dto.EventDto;
+import com.lostway.eventmanager.controller.dto.EventSearchRequestDto;
 import com.lostway.eventmanager.controller.dto.EventUpdateRequestDto;
 import com.lostway.eventmanager.mapper.EventMapper;
 import com.lostway.eventmanager.service.EventService;
@@ -74,4 +75,12 @@ public class EventController {
         EventDto result = mapper.toDto(newEvent);
         return ResponseEntity.ok(result);
     }
+    
+    @PostMapping("/search")
+    public ResponseEntity<List<EventDto>> searchEvent(@RequestBody @Valid EventSearchRequestDto eventSearchRequestDto) {
+        List<Event> eventList = eventService.searchEventByFilter(eventSearchRequestDto);
+        List<EventDto> result = mapper.toDto(eventList);
+        return ResponseEntity.ok(result);
+    }
+
 }

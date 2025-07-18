@@ -108,4 +108,15 @@
             );
         </sql>
     </changeSet>
+    <changeSet id="008" author="lostway" runOnChange="true">
+        <comment>Добавление индексов для events</comment>
+        <sql>
+            create index idx_events_max_places on events (max_places);
+            create index idx_events_date on events (date);
+            create index idx_events_cost on events (cost);
+            create index idx_events_duration on events (duration);
+            create index idx_events_location_id on events (location_id);
+            create index idx_events_status on events (status);
+        </sql>
+    </changeSet>
 </databaseChangeLog>
