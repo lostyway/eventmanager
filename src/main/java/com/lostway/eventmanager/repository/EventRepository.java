@@ -28,8 +28,6 @@ public interface EventRepository extends JpaRepository<EventEntity, Integer> {
     @Lock(PESSIMISTIC_WRITE)
     Optional<EventEntity> findEventById(@Param("eventId") Integer id);
 
-    boolean existsById(Integer eventId);
-
     List<EventEntity> findByStatusIn(List<EventStatus> statues);
 
     @Query("""
