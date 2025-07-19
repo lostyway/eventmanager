@@ -30,7 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @AutoConfigureMockMvc
 @SpringBootTest
-@WithMockUser
+@WithMockUser(username = "user", authorities = {"USER", "ADMIN"})
 class LocationControllerTest {
 
     @Autowired

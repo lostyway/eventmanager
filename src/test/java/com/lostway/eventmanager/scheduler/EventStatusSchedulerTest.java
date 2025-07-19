@@ -29,7 +29,6 @@ class EventStatusSchedulerTest {
 
     @BeforeEach
     void setUp() {
-        // 15:00 МСК
         Clock clock = Clock.fixed(
                 ZonedDateTime.of(2025, 7, 19, 15, 0, 0, 0, ZoneId.of("Europe/Moscow")).toInstant(),
                 ZoneId.of("Europe/Moscow")
@@ -40,8 +39,8 @@ class EventStatusSchedulerTest {
     @Test
     void shouldUpdateStatusToStarted_WhenEventHasStarted() {
         EventEntity event = new EventEntity();
-        event.setDate(LocalDateTime.of(2025, 7, 19, 14, 55)); // началось 5 минут назад
-        event.setDuration(20); // закончится в 15:15
+        event.setDate(LocalDateTime.of(2025, 7, 19, 14, 55));
+        event.setDuration(20);
         event.setStatus(EventStatus.WAIT_START);
 
         when(repository.findByStatusIn(anyList())).thenReturn(List.of(event));
@@ -54,21 +53,36 @@ class EventStatusSchedulerTest {
     @Test
     void shouldUpdateStatusToFinished_WhenEventHasEnded() {
         EventEntity event = new EventEntity();
-        event.setDate(LocalDateTime.of(2025, 7, 19, 14, 0)); // началось в 14:00
-        event.setDuration(30); // закончилось в 14:30
+        event.setDate(LocalDateTime.of(2025, 7, 19, 14, 0));
+        event.setDuration(30);
         event.setStatus(EventStatus.STARTED);
+        EventEntity event2 = new EventEntity();
+        event2.setDate(LocalDateTime.of(2025, 7, 19, 14, 0));
+        event2.setDuration(30);
+        event2.setStatus(EventStatus.STARTED);
+        EventEntity event3 = new EventEntity();
+        event3.setDate(LocalDateTime.of(2025, 7, 19, 14, 0));
+        event3.setDuration(30);
+        event3.setStatus(EventStatus.STARTED);
+        EventEntity event4 = new EventEntity();
+        event4.setDate(LocalDateTime.of(2025, 7, 19, 14, 0));
+        event4.setDuration(30);
+        event4.setStatus(EventStatus.STARTED);
 
-        when(repository.findByStatusIn(anyList())).thenReturn(List.of(event));
+        when(repository.findByStatusIn(anyList())).thenReturn(List.of(event, event2, event3, event4));
 
         scheduler.updateStatus();
 
         assertThat(EventStatus.FINISHED).isEqualTo(event.getStatus());
+        assertThat(EventStatus.FINISHED).isEqualTo(event2.getStatus());
+        assertThat(EventStatus.FINISHED).isEqualTo(event3.getStatus());
+        assertThat(EventStatus.FINISHED).isEqualTo(event4.getStatus());
     }
 
     @Test
     void shouldNotUpdate_WhenEventIsInFuture() {
         EventEntity event = new EventEntity();
-        event.setDate(LocalDateTime.of(2025, 7, 19, 16, 0)); // начнется в будущем
+        event.setDate(LocalDateTime.of(2025, 7, 19, 16, 0));
         event.setDuration(30);
         event.setStatus(EventStatus.WAIT_START);
 
