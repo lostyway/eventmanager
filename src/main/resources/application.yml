@@ -16,6 +16,12 @@ spring:
       ddl-auto: none
     show-sql: true
     open-in-view: false
+    properties:
+      hibernate:
+        jdbc:
+          batch_size: 50
+        order_updates: true
+        order_inserts: true
 
 logging:
   level:

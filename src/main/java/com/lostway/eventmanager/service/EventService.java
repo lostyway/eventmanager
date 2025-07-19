@@ -15,7 +15,6 @@ import com.lostway.eventmanager.service.model.Event;
 import com.lostway.eventmanager.service.model.Location;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -175,13 +174,5 @@ public class EventService {
         }
 
         return eventEntity;
-    }
-
-    /**
-     * Обновление статусов мероприятий раз в N (scheduler.cron в application.yml) минут
-     */
-    @Scheduled(cron = "${scheduler.cron}")
-    public void updateStatus() {
-        repository.updateStatus(EventStatus.STARTED.name(), EventStatus.FINISHED.name(), EventStatus.WAIT_START.name());
     }
 }

@@ -7,7 +7,6 @@ import com.lostway.eventmanager.repository.entity.LocationEntity;
 import jakarta.validation.constraints.Positive;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -32,6 +31,8 @@ public interface EventRepository extends JpaRepository<EventEntity, Integer> {
     boolean existsById(@Positive Integer eventId);
 
     EventEntity findEventByLocation(LocationEntity entity);
+
+    List<EventEntity> findByStatusIn(List<EventStatus> statues);
 
     @Query("""
                select e from EventEntity e
@@ -90,19 +91,4 @@ public interface EventRepository extends JpaRepository<EventEntity, Integer> {
                 eventStatus
         );
     }
-
-    @Modifying
-    @Query(value = """
-            UPDATE events
-            SET status =
-                CASE
-                    WHEN date < now() AND (date + (duration * interval '1 minute')) > now() THEN :startedStatus
-                    WHEN (date + (duration * interval '1 minute')) <= now() THEN :completedStatus
-                    ELSE status
-                END
-            WHERE status = :waitForStart
-            """, nativeQuery = true)
-    void updateStatus(@Param("startedStatus") String startedStatus,
-                      @Param("completedStatus") String completedStatus,
-                      @Param("waitForStart") String waitForStart);
 }
