@@ -18,6 +18,7 @@ import java.time.LocalDateTime;
 @EqualsAndHashCode(callSuper = false)
 @Getter
 @Setter
+@Builder
 public class EventEntity extends AuditableEntity {
 
     @Id

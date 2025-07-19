@@ -12,3 +12,6 @@ spring:
   liquibase:
     enabled: true
     change-log: db/changelog/master.xml
+logging:
+  level:
+    org.hibernate.SQL: DEBUG

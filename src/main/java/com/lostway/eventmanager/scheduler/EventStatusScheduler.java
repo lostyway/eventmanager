@@ -6,6 +6,7 @@ import com.lostway.eventmanager.repository.entity.EventEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Clock;
 import java.time.LocalDateTime;
@@ -19,6 +20,7 @@ public class EventStatusScheduler {
     private final EventRepository repository;
     private final Clock clock;
 
+    @Transactional
     @Scheduled(cron = "${scheduler.cron}")
     public void updateStatus() {
         List<EventEntity> startedEvents = repository.findByStatusIn(List.of(
