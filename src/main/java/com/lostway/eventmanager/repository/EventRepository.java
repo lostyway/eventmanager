@@ -60,7 +60,6 @@ public interface EventRepository extends JpaRepository<EventEntity, Integer> {
                                    @Param("eventStatus") EventStatus eventStatus
     );
 
-
     default List<EventEntity> parseAndFindByFilter(EventSearchRequestDto eventSearchRequestDto) {
         String name = eventSearchRequestDto.name() == null
                 ? null

@@ -6,7 +6,6 @@ import com.lostway.eventmanager.exception.*;
 import com.lostway.eventmanager.mapper.EventMapper;
 import com.lostway.eventmanager.mapper.LocationMapper;
 import com.lostway.eventmanager.repository.EventRepository;
-import com.lostway.eventmanager.repository.LocationRepository;
 import com.lostway.eventmanager.repository.UserEventRegistrationEntityRepository;
 import com.lostway.eventmanager.repository.entity.EventEntity;
 import com.lostway.eventmanager.repository.entity.LocationEntity;
@@ -30,7 +29,6 @@ import java.util.Objects;
 public class EventService {
     private final EventRepository repository;
     private final LocationService locationService;
-    private final LocationRepository locationRepository;
     private final EventMapper mapper;
     private final UserService userService;
     private final EventValidatorService eventValidatorService;

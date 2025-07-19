@@ -75,12 +75,11 @@ public class EventController {
         EventDto result = mapper.toDto(newEvent);
         return ResponseEntity.ok(result);
     }
-    
+
     @PostMapping("/search")
     public ResponseEntity<List<EventDto>> searchEvent(@RequestBody @Valid EventSearchRequestDto eventSearchRequestDto) {
         List<Event> eventList = eventService.searchEventByFilter(eventSearchRequestDto);
         List<EventDto> result = mapper.toDto(eventList);
         return ResponseEntity.ok(result);
     }
-
 }
