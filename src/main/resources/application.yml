@@ -28,3 +28,6 @@ secret.key: verylongsecretkeyforpetprojecteventmanagerlostway2025
 
 #In second
 expiration.time: 3600
+
+scheduler:
+  cron: 0 * * * * *
