@@ -20,7 +20,8 @@ import static jakarta.persistence.LockModeType.PESSIMISTIC_WRITE;
 
 @Repository
 public interface EventRepository extends JpaRepository<EventEntity, Integer> {
-    boolean existsEventEntitiesByLocation(LocationEntity location);
+
+    boolean existsEventEntitiesByLocationAndStatusIn(LocationEntity location, List<EventStatus> statues);
 
     List<EventEntity> findEventByOwnerId(Long id);
 

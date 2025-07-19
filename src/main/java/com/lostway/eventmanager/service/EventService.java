@@ -4,7 +4,6 @@ import com.lostway.eventmanager.controller.dto.EventSearchRequestDto;
 import com.lostway.eventmanager.enums.EventStatus;
 import com.lostway.eventmanager.exception.*;
 import com.lostway.eventmanager.mapper.EventMapper;
-import com.lostway.eventmanager.mapper.LocationMapper;
 import com.lostway.eventmanager.repository.EventRepository;
 import com.lostway.eventmanager.repository.UserEventRegistrationEntityRepository;
 import com.lostway.eventmanager.repository.entity.EventEntity;
@@ -33,16 +32,12 @@ public class EventService {
     private final UserService userService;
     private final EventValidatorService eventValidatorService;
     private final UserEventRegistrationEntityRepository userEventRegistrationEntityRepository;
-    private final LocationMapper locationMapper;
 
     public Event createNewEvent(Event eventToCreate) {
         Location location = locationService.findById(eventToCreate.getLocationId());
 
         if (eventValidatorService.isLocationPlanned(location)) {
-            EventEntity event = repository.findEventByLocation(locationMapper.toEntity(location));
-            if (event.getStatus() != EventStatus.CANCELLED) {
-                throw new LocationIsPlannedException("Локация уже занята другим мероприятием");
-            }
+            throw new LocationIsPlannedException("Локация уже занята другим мероприятием");
         }
 
         if (location.getCapacity() < eventToCreate.getMaxPlaces()) {
