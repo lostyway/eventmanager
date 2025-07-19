@@ -4,7 +4,6 @@ import com.lostway.eventmanager.controller.dto.EventSearchRequestDto;
 import com.lostway.eventmanager.enums.EventStatus;
 import com.lostway.eventmanager.repository.entity.EventEntity;
 import com.lostway.eventmanager.repository.entity.LocationEntity;
-import jakarta.validation.constraints.Positive;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
@@ -29,9 +28,7 @@ public interface EventRepository extends JpaRepository<EventEntity, Integer> {
     @Lock(PESSIMISTIC_WRITE)
     Optional<EventEntity> findEventById(@Param("eventId") Integer id);
 
-    boolean existsById(@Positive Integer eventId);
-
-    EventEntity findEventByLocation(LocationEntity entity);
+    boolean existsById(Integer eventId);
 
     List<EventEntity> findByStatusIn(List<EventStatus> statues);
 
