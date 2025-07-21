@@ -10,7 +10,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
 
 @SpringBootTest
 @Transactional
-@WithMockUser(authorities = {"ADMIN"})
+@WithMockUser(username = "test", authorities = {"USER"})
 public class IntegrationTestBase {
 
     public static final PostgreSQLContainer<?> CONTAINER = new PostgreSQLContainer<>("postgres:15");
