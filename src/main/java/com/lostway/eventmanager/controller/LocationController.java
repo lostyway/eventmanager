@@ -28,7 +28,7 @@ public class LocationController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createLocation(@RequestBody @Valid LocationDto dto) {
+    public ResponseEntity<LocationDto> createLocation(@RequestBody @Valid LocationDto dto) {
         Location location = service.createLocation(mapper.toModel(dto));
         LocationDto locationDto = mapper.toDto(location);
         return ResponseEntity.status(HttpStatus.CREATED).body(locationDto);
@@ -40,20 +40,20 @@ public class LocationController {
      * @return Локация которую удалили
      */
     @DeleteMapping("/{locationId}")
-    public ResponseEntity<?> deleteLocation(@PathVariable Integer locationId) {
+    public ResponseEntity<LocationDto> deleteLocation(@PathVariable Integer locationId) {
         Location location = service.removeById(locationId);
         return ResponseEntity.ok(mapper.toDto(location));
     }
 
     @GetMapping("/{locationId}")
-    public ResponseEntity<?> getLocationById(@PathVariable Integer locationId) {
+    public ResponseEntity<LocationDto> getLocationById(@PathVariable Integer locationId) {
         Location location = service.findById(locationId);
         return ResponseEntity.ok(mapper.toDto(location));
     }
 
     @PutMapping("/{locationId}")
-    public ResponseEntity<?> updateLocation(@PathVariable Integer locationId,
-                                            @RequestBody @Valid LocationDto dto) {
+    public ResponseEntity<LocationDto> updateLocation(@PathVariable Integer locationId,
+                                                      @RequestBody @Valid LocationDto dto) {
         Location updateLocation = mapper.toModel(dto);
         Location updated = service.updateLocation(locationId, updateLocation);
         return ResponseEntity.ok(mapper.toDto(updated));

@@ -9,6 +9,8 @@ spring:
     hibernate:
       ddl-auto: none
     show-sql: true
+    auditing:
+      enabled: false
   liquibase:
     enabled: true
     change-log: db/changelog/master.xml
