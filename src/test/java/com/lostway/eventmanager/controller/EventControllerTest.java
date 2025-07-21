@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lostway.eventmanager.config.TestSecurityConfig;
 import com.lostway.eventmanager.controller.dto.EventCreateRequestDto;
 import com.lostway.eventmanager.controller.dto.EventDto;
+import com.lostway.eventmanager.controller.dto.EventSearchRequestDto;
 import com.lostway.eventmanager.controller.dto.EventUpdateRequestDto;
 import com.lostway.eventmanager.enums.EventStatus;
 import com.lostway.eventmanager.mapper.EventMapper;
@@ -23,12 +24,13 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(controllers = EventController.class, excludeFilters = {
         @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = JWTAuthFilter.class)
@@ -54,6 +56,7 @@ class EventControllerTest {
 
     @Autowired
     private ObjectMapper jacksonObjectMapper;
+    private EventSearchRequestDto eventSearchRequestDto;
 
     private EventDto createTestEventDto() {
         return new EventDto(
@@ -102,7 +105,20 @@ class EventControllerTest {
                 .ownerId(1L)
                 .status(EventStatus.WAIT_START)
                 .build();
+
+        eventSearchRequestDto = new EventSearchRequestDto("Test Event",
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null);
     }
+
 
     @Test
     void whenCreateNewEventIsSuccessful() throws Exception {
@@ -115,4 +131,78 @@ class EventControllerTest {
                 .andExpect(jsonPath("$.name").value(event.getName()));
     }
 
+    @Test
+    void whenGetMyEventsIsSuccessful() throws Exception {
+        when(eventService.getUsersEvents()).thenReturn(List.of(event));
+
+        mockMvc.perform(get("/events/my"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$.size()").value(1))
+                .andExpect(jsonPath("$[0].name").value(event.getName()));
+    }
+
+    @Test
+    void whenRegisterNewEventIsSuccessful() throws Exception {
+        mockMvc.perform(post("/events/registrations/{eventId}", event.getId()))
+                .andExpect(status().isOk())
+                .andExpect(content().string("Успешная регистрация на мероприятие"));
+    }
+
+    @Test
+    void whenCancelEventIsSuccessful() throws Exception {
+        mockMvc.perform(delete("/events/registrations/cancel/{eventId}", event.getId()))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void whenGetUserRegistrationsIsSuccessful() throws Exception {
+        when(eventService.getUserRegistrationsOnEvents()).thenReturn(List.of(event));
+
+        mockMvc.perform(get("/events/registrations/my"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[0].name").value(event.getName()));
+    }
+
+    @Test
+    void whenGetEventByIdIsSuccessful() throws Exception {
+        when(eventService.getEventById(event.getId())).thenReturn(event);
+
+        mockMvc.perform(get("/events/{eventId}", event.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value(event.getName()));
+    }
+
+    @Test
+    void whenDeleteEventByIdIsSuccessful() throws Exception {
+        mockMvc.perform(delete("/events/{eventId}", event.getId()))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void whenUpdateEventIsSuccessful() throws Exception {
+        Event newEvent = new Event(1, "newName", 10, LocalDateTime.now(),
+                100, 5, 30, 1, 1L, EventStatus.WAIT_START);
+        when(eventService.updateEvent(eq(event.getId()), any(Event.class))).thenReturn(newEvent);
+        mockMvc.perform(put("/events/{eventId}", event.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jacksonObjectMapper.writeValueAsString(eventUpdateRequestDto)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value(newEvent.getName()))
+                .andExpect(jsonPath("$.cost").value(newEvent.getCost()))
+                .andExpect(jsonPath("$.status").value(newEvent.getStatus().toString()));
+    }
+
+    @Test
+    void whenSearchEventIsSuccessful() throws Exception {
+        when(eventService.searchEventByFilter(any())).thenReturn(List.of(event));
+        mockMvc.perform(post("/events/search")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jacksonObjectMapper.writeValueAsString(eventSearchRequestDto)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[0].name").value(event.getName()))
+                .andExpect(jsonPath("$[0].status").value(event.getStatus().toString()));
+    }
 }
