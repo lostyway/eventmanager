@@ -1,5 +1,6 @@
 package com.lostway.eventmanager.controller;
 
+import com.lostway.eventmanager.IntegrationTestBase;
 import com.lostway.eventmanager.controller.dto.LocationDto;
 import com.lostway.eventmanager.exception.LocationIsPlannedException;
 import com.lostway.eventmanager.exception.LocationNotFoundException;
@@ -15,7 +16,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
@@ -30,8 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @AutoConfigureMockMvc
 @SpringBootTest
-@WithMockUser(username = "user", authorities = {"USER", "ADMIN"})
-class LocationControllerTest {
+class LocationControllerTest extends IntegrationTestBase {
 
     @Autowired
     private LocationController locationController;

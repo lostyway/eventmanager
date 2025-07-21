@@ -5,6 +5,7 @@ import com.lostway.eventmanager.enums.EventStatus;
 import com.lostway.eventmanager.exception.*;
 import com.lostway.eventmanager.mapper.EventMapper;
 import com.lostway.eventmanager.repository.EventRepository;
+import com.lostway.eventmanager.repository.LocationRepository;
 import com.lostway.eventmanager.repository.UserEventRegistrationEntityRepository;
 import com.lostway.eventmanager.repository.entity.EventEntity;
 import com.lostway.eventmanager.repository.entity.LocationEntity;
@@ -32,6 +33,7 @@ public class EventService {
     private final UserService userService;
     private final EventValidatorService eventValidatorService;
     private final UserEventRegistrationEntityRepository userEventRegistrationEntityRepository;
+    private final LocationRepository locationRepository;
 
     public Event createNewEvent(Event eventToCreate) {
         Location location = locationService.findById(eventToCreate.getLocationId());
@@ -67,6 +69,10 @@ public class EventService {
 
         UserEntity userEntity = userService.getUserByIdForUser(getSecurityUserId());
 
+        Location location = locationService.findById(eventEntity.getLocation().getId());
+
+        int capacity = location.getCapacity();
+
         if (!eventEntity.getStatus().equals(EventStatus.WAIT_START)) {
             throw new EventAlreadyStartedException("Регистрация на мероприятие уже закрыто.");
         }
@@ -77,7 +83,7 @@ public class EventService {
 
         int placeToBuy = eventEntity.getOccupiedPlaces() + 1;
 
-        if (placeToBuy > eventEntity.getMaxPlaces() || placeToBuy > eventEntity.getLocation().getCapacity()) {
+        if (placeToBuy > eventEntity.getMaxPlaces() || placeToBuy > capacity) {
             throw new NotEnoughPlaceException("Недостаточно мест на мероприятии для бронирования");
         }
 
@@ -169,5 +175,10 @@ public class EventService {
         }
 
         return eventEntity;
+    }
+
+    public Event findEventById(Integer id) {
+        return mapper.toModel(repository.findById(id)
+                .orElseThrow(EventNotFoundException::new));
     }
 }
