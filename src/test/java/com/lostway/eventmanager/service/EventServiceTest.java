@@ -2,9 +2,7 @@ package com.lostway.eventmanager.service;
 
 import com.lostway.eventmanager.IntegrationTestBase;
 import com.lostway.eventmanager.enums.Role;
-import com.lostway.eventmanager.exception.CapacityNotEnoughException;
-import com.lostway.eventmanager.exception.LocationIsPlannedException;
-import com.lostway.eventmanager.exception.LocationNotFoundException;
+import com.lostway.eventmanager.exception.*;
 import com.lostway.eventmanager.repository.LocationRepository;
 import com.lostway.eventmanager.repository.UserRepository;
 import com.lostway.eventmanager.repository.entity.LocationEntity;
@@ -18,7 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDateTime;
 
-import static com.lostway.eventmanager.enums.EventStatus.WAIT_START;
+import static com.lostway.eventmanager.enums.EventStatus.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -114,9 +112,108 @@ class EventServiceTest extends IntegrationTestBase {
         @Test
         void whenRegisterNewEventIsSuccessful() {
             eventService.registerNewEvent(temp.getId());
-            int countOfMembers = eventService.getUsersEvents().get(0).getOccupiedPlaces();
+            int countOfMembers = eventService.getUsersEvents().getFirst().getOccupiedPlaces();
             assertThat(countOfMembers).isEqualTo(1);
-
         }
+
+        @Test
+        void whenRepeatRegisterThenFailed() {
+            eventService.registerNewEvent(temp.getId());
+            int countOfMembers = eventService.getUsersEvents().getFirst().getOccupiedPlaces();
+            assertThat(countOfMembers).isEqualTo(1);
+            Exception exception = assertThrows(AlreadyRegisteredException.class, () -> eventService.registerNewEvent(temp.getId()));
+            assertThat(exception).hasMessageContaining("Пользователь уже зарегистрирован на это мероприятие.");
+        }
+
+        @Test
+        void whenRegisterNewEventIsFailedByBadEventId() {
+            Exception exception = assertThrows(EventNotFoundException.class, () -> eventService.registerNewEvent(-1));
+            assertThat(exception).hasMessageContaining("не было найдено");
+        }
+
+        @Test
+        void whenDeleteEventRegistrationIsSuccessful() {
+            eventService.registerNewEvent(temp.getId());
+            eventService.deleteEventRegistration(temp.getId());
+            int countOfMembers = eventService.getUsersEvents().getFirst().getOccupiedPlaces();
+            assertThat(countOfMembers).isZero();
+        }
+
+        @Test
+        void whenDeleteEventRegistrationIsSuccessfulCheckMembers() {
+            eventService.registerNewEvent(temp.getId());
+            int countOfMembers = eventService.getUsersEvents().getFirst().getOccupiedPlaces();
+            assertThat(countOfMembers).isEqualTo(1);
+            eventService.deleteEventRegistration(temp.getId());
+            int countOfMembersAfterDelete = eventService.getUsersEvents().getFirst().getOccupiedPlaces();
+            assertThat(countOfMembersAfterDelete).isZero();
+        }
+
+        @Test
+        void whenGetUserRegistrationsOnEventsThenOne() {
+            eventService.registerNewEvent(temp.getId());
+            var events = eventService.getUserRegistrationsOnEvents();
+            assertThat(events).hasSize(1);
+        }
+
+        @Test
+        void whenGetUserRegistrationsOnEventsThenTwo() {
+            Event newEvent = new Event(
+                    null,
+                    "event name2",
+                    20,
+                    LocalDateTime.of(2025, 12, 11, 0, 0), 100, 0, 30,
+                    locationEntity2.getId(),
+                    user.getId(),
+                    WAIT_START);
+
+            newEvent = eventService.createNewEvent(newEvent);
+            eventService.registerNewEvent(temp.getId());
+            var events = eventService.getUserRegistrationsOnEvents();
+            assertThat(events).hasSize(1);
+            eventService.registerNewEvent(newEvent.getId());
+            var eventsTwo = eventService.getUserRegistrationsOnEvents();
+            assertThat(eventsTwo).hasSize(2);
+        }
+    }
+
+    @Test
+    void whenRegisterNewEventIsFailedByBadStatus() {
+        event.setStatus(STARTED);
+        event = eventService.createNewEvent(event);
+        Exception exception = assertThrows(EventAlreadyStartedException.class, () -> eventService.registerNewEvent(event.getId()));
+        assertThat(exception).hasMessageContaining("Регистрация на мероприятие уже закрыто.");
+    }
+
+    @Test
+    void whenRegisterNewEventIsFailedByCapacity() {
+        event.setOccupiedPlaces(1000);
+        event = eventService.createNewEvent(event);
+        Exception exception = assertThrows(NotEnoughPlaceException.class, () -> eventService.registerNewEvent(event.getId()));
+        assertThat(exception).hasMessageContaining("Недостаточно мест на мероприятии для бронирования");
+    }
+
+    @Test
+    void whenDeleteEventRegistrationIsBadForStatus1() {
+        event.setStatus(STARTED);
+        event = eventService.createNewEvent(event);
+        Exception exception = assertThrows(EventAlreadyStartedException.class, () -> eventService.deleteEventRegistration(event.getId()));
+        assertThat(exception).hasMessageContaining("Регистрация на мероприятие уже закрыто. Отменить регистрацию не получится");
+    }
+
+    @Test
+    void whenDeleteEventRegistrationIsBadForStatus2() {
+        event.setStatus(FINISHED);
+        event = eventService.createNewEvent(event);
+        Exception exception = assertThrows(EventAlreadyStartedException.class, () -> eventService.deleteEventRegistration(event.getId()));
+        assertThat(exception).hasMessageContaining("Регистрация на мероприятие уже закрыто. Отменить регистрацию не получится");
+    }
+
+    @Test
+    void whenDeleteEventRegistrationIsBadForStatus3() {
+        event.setStatus(CANCELLED);
+        event = eventService.createNewEvent(event);
+        Exception exception = assertThrows(EventAlreadyStartedException.class, () -> eventService.deleteEventRegistration(event.getId()));
+        assertThat(exception).hasMessageContaining("Регистрация на мероприятие уже закрыто. Отменить регистрацию не получится");
     }
 }
