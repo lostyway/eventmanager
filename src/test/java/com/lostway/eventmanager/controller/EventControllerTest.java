@@ -7,6 +7,7 @@ import com.lostway.eventmanager.controller.dto.EventDto;
 import com.lostway.eventmanager.controller.dto.EventSearchRequestDto;
 import com.lostway.eventmanager.controller.dto.EventUpdateRequestDto;
 import com.lostway.eventmanager.enums.EventStatus;
+import com.lostway.eventmanager.exception.LocationIsPlannedException;
 import com.lostway.eventmanager.mapper.EventMapper;
 import com.lostway.eventmanager.mapper.EventMapperImpl;
 import com.lostway.eventmanager.security.JWTAuthFilter;
@@ -26,6 +27,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
@@ -204,5 +206,94 @@ class EventControllerTest {
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$[0].name").value(event.getName()))
                 .andExpect(jsonPath("$[0].status").value(event.getStatus().toString()));
+    }
+
+    @Test
+    void whenCreateEventIsFailedByNameBadParams() throws Exception {
+        String invalidJson = """
+                {
+                   "name": "",
+                   "maxPlaces": "10",
+                   "date": "2099-01-01T00:00:00",
+                   "cost": "100",
+                   "duration": "30",
+                   "locationId": "1"
+                }
+                """;
+        mockMvc.perform(post("/events")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(invalidJson))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Данные сущности введены некорректно"))
+                .andExpect(jsonPath("$.detailedMessage").value("Поле 'name' : must not be blank"))
+                .andExpect(jsonPath("$.dateTime").exists());
+
+    }
+
+    @Test
+    void whenCreateEventIsFailedByMaxPlacesBadParams() throws Exception {
+        String invalidJson = """
+                {
+                   "name": "name",
+                   "maxPlaces": "-1",
+                   "date": "2099-01-01T00:00:00",
+                   "cost": "100",
+                   "duration": "30",
+                   "locationId": "1"
+                }
+                """;
+        mockMvc.perform(post("/events")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(invalidJson))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Данные сущности введены некорректно"))
+                .andExpect(jsonPath("$.detailedMessage").value("Поле 'maxPlaces' : must be greater than 0"))
+                .andExpect(jsonPath("$.dateTime").exists());
+
+    }
+
+    @Test
+    void whenCreateEventIsFailedByMoreThenOneBadParams() throws Exception {
+        String invalidJson = """
+                {
+                   "name": "",
+                   "maxPlaces": "-1",
+                   "date": "2099-01-01T00:00:00",
+                   "cost": "100",
+                   "duration": "30",
+                   "locationId": "1"
+                }
+                """;
+        mockMvc.perform(post("/events")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(invalidJson))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Данные сущности введены некорректно"))
+                .andExpect(jsonPath("$.detailedMessage").value(containsString("Поле 'maxPlaces' : must be greater than 0")))
+                .andExpect(jsonPath("$.detailedMessage").value(containsString("Поле 'name' : must not be blank")))
+                .andExpect(jsonPath("$.dateTime").exists());
+
+    }
+
+    @Test
+    void whenCreateNewEventFailedByPlannedLocation() throws Exception {
+        when(eventService.createNewEvent(any())).thenThrow(new LocationIsPlannedException("Локация уже занята другим мероприятием"));
+
+        mockMvc.perform(post("/events")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jacksonObjectMapper.writeValueAsString(eventCreateRequestDto)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Локация уже занята мероприятием"))
+                .andExpect(jsonPath("$.detailedMessage").value("Локация уже занята другим мероприятием"))
+                .andExpect(jsonPath("$.dateTime").exists());
+    }
+
+    @Test
+    void whenCallInvalidUrl() throws Exception {
+        mockMvc.perform(post("/random"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value("Данный адрес не был найден"))
+                .andExpect(jsonPath("$.detailedMessage").value("No static resource random."))
+                .andExpect(jsonPath("$.dateTime").exists());
     }
 }
