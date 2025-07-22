@@ -1,6 +1,7 @@
 package com.lostway.eventmanager.exception.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.Builder;
 
 import java.time.LocalDateTime;
 
@@ -11,6 +12,7 @@ import java.time.LocalDateTime;
  * dateTime <-- Дата и время возникновения ошибки. Формат "YYYY-MM-DDThh:mm:ss"<p>
  */
 
+@Builder
 public record ErrorMessageResponse(
         String message,
         String detailedMessage,

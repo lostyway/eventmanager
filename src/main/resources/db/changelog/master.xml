@@ -46,7 +46,7 @@
                 name            text,
                 owner_id        int references users (id),
                 max_places      int       not null,
-                occupied_places int       not null,
+                occupied_places int,
                 date            timestamp not null,
                 cost            decimal   not null,
                 duration        int       not null,
@@ -82,6 +82,41 @@
                 add column last_modified_by text;
             alter table users
                 add column last_modified_at timestamp;
+        </sql>
+    </changeSet>
+    <changeSet id="006" author="lostway">
+        <comment>Добавление аудита для таблицы events</comment>
+        <sql>
+            alter table events
+                add column created_by text;
+            alter table events
+                add column created_at timestamp;
+            alter table events
+                add column last_modified_by text;
+            alter table events
+                add column last_modified_at timestamp;
+        </sql>
+    </changeSet>
+    <changeSet id="007" author="lostway">
+        <comment>Добавление таблицы для контроля участников мероприятия</comment>
+        <sql>
+            create table user_event_registrations
+            (
+                id       serial primary key,
+                user_id  int references users (id),
+                event_id int references events (id)
+            );
+        </sql>
+    </changeSet>
+    <changeSet id="008" author="lostway" runOnChange="true">
+        <comment>Добавление индексов для events</comment>
+        <sql>
+            create index idx_events_max_places on events (max_places);
+            create index idx_events_date on events (date);
+            create index idx_events_cost on events (cost);
+            create index idx_events_duration on events (duration);
+            create index idx_events_location_id on events (location_id);
+            create index idx_events_status on events (status);
         </sql>
     </changeSet>
 </databaseChangeLog>

@@ -1349,7 +1349,7 @@ components:
     EventDto:
       example:
         occupiedPlaces: 15
-        date: 2000-01-23T04:56:07.000+00:00
+        date: 2000-01-23T04:56:07
         duration: 60
         cost: 1200
         maxPlaces: 10
@@ -1426,7 +1426,7 @@ components:
     EventCreateRequestDto:
       description: Объект с данными для создания нового мероприятия.
       example:
-        date: 2000-01-23T04:56:07.000+00:00
+        date: 2000-01-23T04:56:07
         duration: 60
         cost: 1200
         maxPlaces: 10
@@ -1470,7 +1470,7 @@ components:
     EventUpdateRequestDto:
       description: Объект с данными для обновления мероприятия
       example:
-        date: 2000-01-23T04:56:07.000+00:00
+        date: 2000-01-23T04:56:07
         duration: 60
         cost: 3000
         maxPlaces: 100
@@ -1512,14 +1512,14 @@ components:
         е поля не заданы, то должен вернуться список всех мероприятий"
       example:
         durationMax: 120
-        dateStartBefore: 2000-01-23T04:56:07.000+00:00
+        dateStartBefore: 2000-01-23T04:56:07
         placesMin: 10
         locationId: 5
         eventStatus: WAIT_START
         name: Лекция
         placesMax: 100
         costMin: 1000
-        dateStartAfter: 2000-01-23T04:56:07.000+00:00
+        dateStartAfter: 2000-01-23T04:56:07
         costMax: 5000
         durationMin: 60
       properties:

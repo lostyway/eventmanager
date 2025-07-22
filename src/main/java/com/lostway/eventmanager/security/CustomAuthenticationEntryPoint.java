@@ -24,7 +24,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
         String stringResponse = createJsonError(response,
                 "Необходима аутентификация",
                 authException.getLocalizedMessage(),
-                HttpServletResponse.SC_FORBIDDEN
+                HttpServletResponse.SC_UNAUTHORIZED
         );
         response.getWriter().write(stringResponse);
     }

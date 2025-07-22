@@ -1,24 +1,28 @@
 package com.lostway.eventmanager.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.lostway.eventmanager.config.TestSecurityConfig;
 import com.lostway.eventmanager.controller.dto.LocationDto;
 import com.lostway.eventmanager.exception.LocationIsPlannedException;
 import com.lostway.eventmanager.exception.LocationNotFoundException;
 import com.lostway.eventmanager.mapper.LocationMapper;
+import com.lostway.eventmanager.mapper.LocationMapperImpl;
+import com.lostway.eventmanager.security.JWTAuthFilter;
 import com.lostway.eventmanager.service.LocationService;
 import com.lostway.eventmanager.service.model.Location;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.List;
 
@@ -28,21 +32,23 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@AutoConfigureMockMvc
-@SpringBootTest
-@WithMockUser
+@WebMvcTest(controllers = LocationController.class, excludeFilters = {
+        @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {JWTAuthFilter.class})
+})
+@Import({TestSecurityConfig.class, LocationMapperImpl.class})
 class LocationControllerTest {
 
     @Autowired
     private LocationController locationController;
 
-    @MockitoBean
+    @Autowired
     private LocationMapper mapper;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @MockitoBean
     private LocationService locationService;
-
-    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Autowired
     private MockMvc mockMvc;
@@ -79,7 +85,7 @@ class LocationControllerTest {
         );
 
         locationToUpdate = new Location(
-                0,
+                locationDto.getId(),
                 "testNameNew",
                 "addressNew",
                 locationDto.getCapacity() + 10,
@@ -99,7 +105,6 @@ class LocationControllerTest {
     void shouldReturnEmptyListWhenNoLocations() throws Exception {
         Page<Location> emptyPage = Page.empty();
         when(locationService.getAll(any())).thenReturn(emptyPage);
-        when(mapper.toDto(any())).thenReturn(locationDto);
 
         mockMvc.perform(get("/locations"))
                 .andExpect(status().isOk())
@@ -110,7 +115,6 @@ class LocationControllerTest {
     @Test
     void whenHaveOneLocationThenGetOneLocation() throws Exception {
         when(locationService.getAll(any())).thenReturn(locationPage);
-        when(mapper.toDto(any())).thenReturn(locationDto);
 
         mockMvc.perform(get("/locations"))
                 .andExpect(status().isOk())
@@ -121,7 +125,6 @@ class LocationControllerTest {
     @Test
     void whenCreatingLocationIsSuccessful() throws Exception {
         when(locationService.createLocation(any())).thenReturn(location);
-        when(mapper.toDto(any())).thenReturn(locationDto);
 
         mockMvc.perform(post("/locations")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -146,7 +149,6 @@ class LocationControllerTest {
     void whenDeleteLocationIsSuccessful() throws Exception {
         Integer id = locationDto.getId();
         when(locationService.removeById(id)).thenReturn(location);
-        when(mapper.toDto(any())).thenReturn(locationDto);
 
         mockMvc.perform(delete("/locations/" + id))
                 .andExpect(status().isOk())
@@ -159,7 +161,6 @@ class LocationControllerTest {
         Integer id = -1;
         String errorMessage = "Локация с ID: '%s' не была найдена".formatted(id);
         when(locationService.removeById(id)).thenThrow(new LocationNotFoundException(errorMessage));
-        when(mapper.toDto(any())).thenReturn(null);
 
         mockMvc.perform(delete("/locations/" + id))
                 .andExpect(status().isNotFound())
@@ -172,7 +173,6 @@ class LocationControllerTest {
         Integer id = -1;
         String errorMessage = "Локация уже занята мероприятием";
         when(locationService.removeById(id)).thenThrow(new LocationIsPlannedException(errorMessage));
-        when(mapper.toDto(any())).thenReturn(null);
 
         mockMvc.perform(delete("/locations/" + id))
                 .andExpect(status().isBadRequest())
@@ -184,7 +184,6 @@ class LocationControllerTest {
     void whenGetLocationByIdIsSuccessful() throws Exception {
         Integer id = locationDto.getId();
         when(locationService.findById(id)).thenReturn(location);
-        when(mapper.toDto(any())).thenReturn(locationDto);
 
         mockMvc.perform(get("/locations/" + id))
                 .andExpect(status().isOk())
@@ -197,7 +196,6 @@ class LocationControllerTest {
         Integer id = -1;
         String errorMessage = "Локация с ID: '%s' не была найдена".formatted(id);
         when(locationService.findById(id)).thenThrow(new LocationNotFoundException(errorMessage));
-        when(mapper.toDto(any())).thenReturn(null);
 
         mockMvc.perform(get("/locations/" + id))
                 .andExpect(status().isNotFound())
@@ -207,8 +205,7 @@ class LocationControllerTest {
 
     @Test
     void whenUpdateLocationIsSuccessful() throws Exception {
-        when(locationService.updateLocation(locationDto.getId(), locationToUpdate)).thenReturn(locationToUpdate);
-        when(mapper.toDto(any())).thenReturn(updatedLocationDto);
+        when(locationService.updateLocation(any(), any(Location.class))).thenReturn(locationToUpdate);
 
         mockMvc.perform(put("/locations/" + locationDto.getId())
                         .contentType(MediaType.APPLICATION_JSON)

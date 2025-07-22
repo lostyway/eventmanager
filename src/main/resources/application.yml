@@ -14,13 +14,21 @@ spring:
   jpa:
     hibernate:
       ddl-auto: none
-    show-sql: true
+    show-sql: false
     open-in-view: false
+    properties:
+      hibernate:
+        jdbc:
+          batch_size: 50
+          batch_versioned_data: true
+        order_inserts: true
+        order_updates: true
+
 
 logging:
   level:
     root: info
-    com.lostway.eventmanager.aop: debug
+    com.lostway.eventmanager.aop: info
 springdoc:
   swagger-ui:
     url: /openapi.yaml
@@ -28,3 +36,6 @@ secret.key: verylongsecretkeyforpetprojecteventmanagerlostway2025
 
 #In second
 expiration.time: 3600
+
+scheduler:
+  cron: 0 * * * * *

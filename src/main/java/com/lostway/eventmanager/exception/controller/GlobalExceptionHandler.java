@@ -14,8 +14,12 @@ import org.springframework.validation.BindException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import static java.time.LocalDateTime.now;
@@ -24,7 +28,29 @@ import static java.time.LocalDateTime.now;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(LocationNotFoundException.class)
+    @ExceptionHandler({
+            NotEnoughPlaceException.class,
+            UserAlreadyExistException.class,
+            IncorrectPasswordException.class,
+            UsernameNotFoundException.class,
+            CapacityNotEnoughException.class,
+            UserNotMemberException.class,
+            AlreadyRegisteredException.class,
+            EventNotFoundException.class
+    })
+    public ResponseEntity<ErrorMessageResponse> handelNotEnoughPlaceException(RuntimeException e) {
+        log.error("Exception handled:", e);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorMessageResponse(
+                        "Некорректный запрос",
+                        e.getMessage(),
+                        now()));
+    }
+
+    @ExceptionHandler({
+            LocationNotFoundException.class,
+            EntityNotFoundException.class
+    })
     public ResponseEntity<ErrorMessageResponse> handelLocationNotFoundException(LocationNotFoundException e) {
         log.error("Exception handled:", e);
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -54,16 +80,6 @@ public class GlobalExceptionHandler {
                         now()));
     }
 
-    @ExceptionHandler(EntityNotFoundException.class)
-    public ResponseEntity<ErrorMessageResponse> handelEntityNotFoundException(EntityNotFoundException e) {
-        log.error("Exception handled:", e);
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(new ErrorMessageResponse(
-                        "Сущность не была найдена",
-                        e.getMessage(),
-                        now()));
-    }
-
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorMessageResponse> handelMethodArgumentNotValidException(MethodArgumentNotValidException e) {
         log.error("Exception handled:", e);
@@ -72,6 +88,19 @@ public class GlobalExceptionHandler {
                         "Данные сущности введены некорректно",
                         getDetailedMessage(e),
                         now()));
+    }
+
+    @ExceptionHandler(HandlerMethodValidationException.class)
+    public ResponseEntity<ErrorMessageResponse> handleValidationException(HandlerMethodValidationException ex) {
+        List<String> details = getDetails(ex);
+
+        ErrorMessageResponse response = ErrorMessageResponse.builder()
+                .message("Ошибка валидации параметров")
+                .detailedMessage(String.join("; ", details))
+                .dateTime(LocalDateTime.now())
+                .build();
+
+        return ResponseEntity.badRequest().body(response);
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
@@ -91,45 +120,22 @@ public class GlobalExceptionHandler {
                         now()));
     }
 
+    @ExceptionHandler(EventAlreadyStartedException.class)
+    public ResponseEntity<ErrorMessageResponse> handelEventAlreadyStartedException(EventAlreadyStartedException e) {
+        log.error("Exception handled:", e);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ErrorMessageResponse(
+                        "Регистрация на мероприятие завершено.",
+                        e.getMessage(),
+                        now()));
+    }
+
     @ExceptionHandler(NoResourceFoundException.class)
     public ResponseEntity<ErrorMessageResponse> handleNoResourceException(NoResourceFoundException e) {
         log.error("Exception handled:", e);
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(new ErrorMessageResponse(
                         "Данный адрес не был найден",
-                        e.getMessage(),
-                        now()
-                ));
-    }
-
-    @ExceptionHandler(UserAlreadyExistException.class)
-    public ResponseEntity<ErrorMessageResponse> handleUserAlreadyExistException(UserAlreadyExistException e) {
-        log.error("Exception handled:", e);
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(new ErrorMessageResponse(
-                        "Некорректный запрос",
-                        e.getMessage(),
-                        now()
-                ));
-    }
-
-    @ExceptionHandler(IncorrectPasswordException.class)
-    public ResponseEntity<ErrorMessageResponse> handleIncorrectPasswordException(IncorrectPasswordException e) {
-        log.error("Exception handled:", e);
-        return ResponseEntity.badRequest()
-                .body(new ErrorMessageResponse(
-                        "Некорректный запрос",
-                        e.getMessage(),
-                        now()
-                ));
-    }
-
-    @ExceptionHandler(UsernameNotFoundException.class)
-    public ResponseEntity<ErrorMessageResponse> handleUsernameNotFoundException(UsernameNotFoundException e) {
-        log.error("Exception handled:", e);
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(new ErrorMessageResponse(
-                        "Некорректный запрос",
                         e.getMessage(),
                         now()
                 ));
@@ -149,7 +155,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(AuthorizationDeniedException.class)
     public ResponseEntity<ErrorMessageResponse> handleAuthorizationDeniedException(AuthorizationDeniedException e) {
         log.error("Exception handled:", e);
-        return ResponseEntity.status(401)
+        return ResponseEntity.status(403)
                 .body(new ErrorMessageResponse(
                         "Недостаточно прав для выполнения операции",
                         e.getMessage(),
@@ -174,5 +180,13 @@ public class GlobalExceptionHandler {
                 .stream()
                 .map(error -> String.format("Поле '%s' : %s", error.getField(), error.getDefaultMessage()))
                 .collect(Collectors.joining("; "));
+    }
+
+    private static List<String> getDetails(HandlerMethodValidationException ex) {
+        return ex.getParameterValidationResults().stream()
+                .flatMap(r -> r.getResolvableErrors().stream())
+                .map(error -> String.format("Field: %s, Message: %s",
+                        Arrays.toString(error.getArguments()), error.getDefaultMessage()))
+                .toList();
     }
 }

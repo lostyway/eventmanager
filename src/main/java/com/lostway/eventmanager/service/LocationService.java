@@ -11,7 +11,6 @@ import com.lostway.eventmanager.service.model.Location;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,16 +19,14 @@ import org.springframework.transaction.annotation.Transactional;
 public class LocationService {
     private final LocationMapper mapper;
     private final LocationRepository repository;
-    private final EventService eventService;
+    private final EventValidatorService eventValidatorService;
 
     @Transactional(readOnly = true)
-    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('USER')")
     public Page<Location> getAll(Pageable pageable) {
         return repository.findAll(pageable).map(mapper::toModel);
     }
 
     @Transactional
-    @PreAuthorize("hasAuthority('ADMIN')")
     public Location createLocation(Location location) {
         if (repository.existsByNameAndAddressAndCapacity(location.getName(), location.getAddress(), location.getCapacity())) {
             throw new LocationAlreadyExists("Такая локация уже существует!");
@@ -49,12 +46,11 @@ public class LocationService {
      * @throws LocationNotFoundException  локация не была найдена
      */
     @Transactional
-    @PreAuthorize("hasAuthority('ADMIN')")
     public Location removeById(Integer locationId) {
         LocationEntity locationEntity = repository.findById(locationId)
                 .orElseThrow(() -> new LocationNotFoundException("Локация с ID: '%s' не была найдена".formatted(locationId)));
 
-        if (isLocationPlanned(locationEntity)) {
+        if (eventValidatorService.isLocationPlanned(mapper.toModel(locationEntity))) {
             throw new LocationIsPlannedException("Локация уже занята мероприятием");
         }
 
@@ -64,12 +60,7 @@ public class LocationService {
         return location;
     }
 
-    private boolean isLocationPlanned(LocationEntity locationEntity) {
-        return eventService.isLocationPlanned(locationEntity);
-    }
-
     @Transactional
-    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('USER')")
     public Location findById(Integer locationId) {
         LocationEntity locationEntity = repository.findById(locationId)
                 .orElseThrow(() -> new LocationNotFoundException("Локация с ID: '%s' не была найдена".formatted(locationId)));
@@ -78,7 +69,6 @@ public class LocationService {
     }
 
     @Transactional
-    @PreAuthorize("hasAuthority('ADMIN')")
     public Location updateLocation(Integer locationId, Location updateLocation) {
         LocationEntity existing = repository.findById(locationId)
                 .orElseThrow(() -> new LocationNotFoundException("Локация для удаления: '%s' не была найдена.".formatted(locationId)));
@@ -91,5 +81,11 @@ public class LocationService {
         toSave.setId(existing.getId());
 
         return mapper.toModel(repository.save(toSave));
+    }
+
+    @Transactional
+    public LocationEntity getLocationFromDb(Integer locationId) {
+        return repository.findById(locationId)
+                .orElseThrow(() -> new LocationNotFoundException("Локация не найдена"));
     }
 }

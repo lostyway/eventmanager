@@ -9,7 +9,6 @@ import com.lostway.eventmanager.security.JWTUtil;
 import com.lostway.eventmanager.service.model.UserModel;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -41,7 +40,6 @@ public class UserService {
         return mapper.toModel(userEntity);
     }
 
-    @PreAuthorize("hasAuthority('ADMIN')")
     public UserModel getUserById(@NotNull Long userId) {
         UserEntity entity = userRepository.findById(userId)
                 .orElseThrow(() -> new UsernameNotFoundException("Пользователь не был найден по ID: " + userId));
@@ -73,5 +71,10 @@ public class UserService {
         String token = jwtUtil.generateToken(model);
         jwtUtil.validateToken(token);
         return token;
+    }
+
+    public UserEntity getUserByIdForUser(@NotNull Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new UsernameNotFoundException("Пользователь не был найден по ID: " + userId));
     }
 }
