@@ -3,6 +3,8 @@ package com.lostway.eventmanager.service;
 import com.lostway.eventmanager.IntegrationTestBase;
 import com.lostway.eventmanager.enums.Role;
 import com.lostway.eventmanager.exception.*;
+import com.lostway.eventmanager.mapper.EventMapper;
+import com.lostway.eventmanager.repository.EventRepository;
 import com.lostway.eventmanager.repository.LocationRepository;
 import com.lostway.eventmanager.repository.UserRepository;
 import com.lostway.eventmanager.repository.entity.LocationEntity;
@@ -21,15 +23,24 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class EventServiceTest extends IntegrationTestBase {
-    @Autowired
-    private EventService eventService;
     private UserEntity user;
     private UserEntity admin;
     private LocationEntity locationEntity;
     private LocationEntity locationEntity2;
+    private Event event;
+
+    @Autowired
+    private EventMapper eventMapper;
+
+    @Autowired
+    private EventService eventService;
+
+    @Autowired
+    private EventRepository eventRepository;
+
     @Autowired
     private UserRepository userRepository;
-    private Event event;
+
     @Autowired
     private LocationRepository locationRepository;
 
@@ -179,8 +190,9 @@ class EventServiceTest extends IntegrationTestBase {
 
     @Test
     void whenRegisterNewEventIsFailedByBadStatus() {
-        event.setStatus(STARTED);
         event = eventService.createNewEvent(event);
+        event.setStatus(STARTED);
+        eventRepository.save(eventMapper.toEntity(event));
         Exception exception = assertThrows(EventAlreadyStartedException.class, () -> eventService.registerNewEvent(event.getId()));
         assertThat(exception).hasMessageContaining("Регистрация на мероприятие уже закрыто.");
     }
@@ -195,24 +207,27 @@ class EventServiceTest extends IntegrationTestBase {
 
     @Test
     void whenDeleteEventRegistrationIsBadForStatus1() {
-        event.setStatus(STARTED);
         event = eventService.createNewEvent(event);
+        event.setStatus(STARTED);
+        eventRepository.save(eventMapper.toEntity(event));
         Exception exception = assertThrows(EventAlreadyStartedException.class, () -> eventService.deleteEventRegistration(event.getId()));
         assertThat(exception).hasMessageContaining("Регистрация на мероприятие уже закрыто. Отменить регистрацию не получится");
     }
 
     @Test
     void whenDeleteEventRegistrationIsBadForStatus2() {
-        event.setStatus(FINISHED);
         event = eventService.createNewEvent(event);
+        event.setStatus(FINISHED);
+        eventRepository.save(eventMapper.toEntity(event));
         Exception exception = assertThrows(EventAlreadyStartedException.class, () -> eventService.deleteEventRegistration(event.getId()));
         assertThat(exception).hasMessageContaining("Регистрация на мероприятие уже закрыто. Отменить регистрацию не получится");
     }
 
     @Test
     void whenDeleteEventRegistrationIsBadForStatus3() {
-        event.setStatus(CANCELLED);
         event = eventService.createNewEvent(event);
+        event.setStatus(CANCELLED);
+        eventRepository.save(eventMapper.toEntity(event));
         Exception exception = assertThrows(EventAlreadyStartedException.class, () -> eventService.deleteEventRegistration(event.getId()));
         assertThat(exception).hasMessageContaining("Регистрация на мероприятие уже закрыто. Отменить регистрацию не получится");
     }

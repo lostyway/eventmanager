@@ -51,5 +51,5 @@ public class EventEntity extends AuditableEntity {
     private LocationEntity location;
 
     @Enumerated(EnumType.STRING)
-    private EventStatus status;
+    private EventStatus status = EventStatus.WAIT_START;
 }

@@ -46,7 +46,7 @@ public class EventService {
 
         Long userId = getSecurityUserId();
         eventToCreate.setOwnerId(userId);
-
+        eventToCreate.setStatus(EventStatus.WAIT_START);
         EventEntity savedEntity = repository.save(mapper.toEntity(eventToCreate));
         return mapper.toModel(savedEntity);
     }
@@ -140,6 +140,8 @@ public class EventService {
         EventEntity newEntity = mapper.toEntity(model);
         newEntity.setOwner(userEntity);
         newEntity.setLocation(location);
+        newEntity.setStatus(EventStatus.WAIT_START);
+        newEntity.setOccupiedPlaces(oldEntity.getOccupiedPlaces());
 
         validateNewEventFields(oldEntity, newEntity);
 
