@@ -1,0 +1,71 @@
+services:
+  eventmanager:
+    build:
+      context: ../eventmanager
+      dockerfile: Dockerfile
+    container_name: eventmanager
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://eventmanager-db:5432/eventmanager
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: password
+    depends_on:
+      - eventmanager-db
+    networks:
+      - event-net
+    restart: unless-stopped
+
+  eventmanager-db:
+    image: postgres:15
+    container_name: eventmanager-db
+    restart: always
+    environment:
+      POSTGRES_DB: eventmanager
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    volumes:
+      - eventmanager-data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    networks:
+      - event-net
+
+  event-notificator:
+    build:
+      context: ../event-notificator
+      dockerfile: Dockerfile
+    container_name: event-notificator
+    ports:
+      - "8082:8082"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://event-notificator-db:5432/eventnotificator
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: password
+    depends_on:
+      - event-notificator-db
+    networks:
+      - event-net
+
+  event-notificator-db:
+    image: postgres:15
+    container_name: event-notificator-db
+    restart: always
+    environment:
+      POSTGRES_DB: eventnotificator
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    volumes:
+      - eventnotificator-data:/var/lib/postgresql/data
+    ports:
+      - "5434:5432"
+    networks:
+      - event-net
+
+volumes:
+  eventmanager-data:
+  eventnotificator-data:
+
+networks:
+  event-net:
+    driver: bridge

@@ -4,13 +4,13 @@ info:
   title: Event Management Service
   version: 1.0.0
 servers:
-- url: http://localhost:8080
+  - url: http://localhost:8081
 security:
-- bearerAuth: []
+  - bearerAuth: [ ]
 tags:
-- name: Locations
-- name: Events
-- name: Users
+  - name: Locations
+  - name: Events
+  - name: Users
 paths:
   /locations:
     get:
@@ -56,7 +56,7 @@ paths:
           description: Внутренняя ошибка сервера
       summary: "Получить список всех локаций. Allowed roles=[ADMIN, USER]"
       tags:
-      - Locations
+        - Locations
     post:
       description: Создать новую локацию. Доступно только админам. Id должен задаваться
         на стороне приложения (базой данных)
@@ -131,21 +131,21 @@ paths:
           description: Внутренняя ошибка сервера
       summary: "Создать новую локацию. Allowed roles=[ADMIN]"
       tags:
-      - Locations
+        - Locations
   /locations/{locationId}:
     delete:
       description: "Удалить локацию по идентификатору. Нельзя удалять те локации,\
         \ на которых уже запланированы какие-то мероприятия (должна возвращаться о\
         шибка 400)"
       parameters:
-      - description: Уникальный идентификатор местоположения
-        in: path
-        name: locationId
-        required: true
-        schema:
-          example: 42
-          format: int64
-          type: integer
+        - description: Уникальный идентификатор местоположения
+          in: path
+          name: locationId
+          required: true
+          schema:
+            example: 42
+            format: int64
+            type: integer
       responses:
         "204":
           content:
@@ -195,20 +195,20 @@ paths:
           description: Внутренняя ошибка сервера
       summary: "Удалить локацию. Allowed roles=[ADMIN]"
       tags:
-      - Locations
+        - Locations
     get:
       description: "Получить локацию по идентификатору. Учтите то, какие должны во\
         звращаться коды ответа при различных сценариях. Например, 404 код, если су\
         щность не найдена."
       parameters:
-      - description: Уникальный идентификатор местоположения
-        in: path
-        name: locationId
-        required: true
-        schema:
-          example: 42
-          format: int64
-          type: integer
+        - description: Уникальный идентификатор местоположения
+          in: path
+          name: locationId
+          required: true
+          schema:
+            example: 42
+            format: int64
+            type: integer
       responses:
         "200":
           content:
@@ -269,21 +269,21 @@ paths:
           description: Внутренняя ошибка сервера
       summary: "Получить локацию по ID. Allowed roles=[ADMIN, USER]"
       tags:
-      - Locations
+        - Locations
     put:
       description: "Обновить место по его идентификатору. Доступно только админам\
         . Учтите валидацию параметров. Также учтите то, что нельзя менять вместите\
         льность локации в меньшую сторону из-за того, что на этой локации уже могу\
         т быть запланированы мероприятия."
       parameters:
-      - description: Уникальный идентификатор местоположения
-        in: path
-        name: locationId
-        required: true
-        schema:
-          example: 42
-          format: int64
-          type: integer
+        - description: Уникальный идентификатор местоположения
+          in: path
+          name: locationId
+          required: true
+          schema:
+            example: 42
+            format: int64
+            type: integer
       requestBody:
         content:
           application/json:
@@ -355,7 +355,7 @@ paths:
           description: Внутренняя ошибка сервера
       summary: "Обновить локацию. Allowed roles=[ADMIN]"
       tags:
-      - Locations
+        - Locations
   /users:
     post:
       description: Доступно без авторизации. По умолчанию создается пользователь с
@@ -396,22 +396,22 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorMessageResponse'
           description: Внутренняя ошибка сервера
-      security: []
+      security: [ ]
       summary: Регистрация нового пользователя
       tags:
-      - Users
+        - Users
   /users/{userId}:
     get:
       description: "Получение данных пользователя (доступно только админам). Учтит\
         е, что пароль не должен возвращаться в теле"
       parameters:
-      - description: Уникальный идентификатор пользователя
-        in: path
-        name: userId
-        required: true
-        schema:
-          format: int64
-          type: integer
+        - description: Уникальный идентификатор пользователя
+          in: path
+          name: userId
+          required: true
+          schema:
+            format: int64
+            type: integer
       responses:
         "200":
           content:
@@ -461,7 +461,7 @@ paths:
           description: Внутренняя ошибка сервера
       summary: "Получить информацию о пользователе по ID. Allowed roles=[ADMIN]"
       tags:
-      - Users
+        - Users
   /users/auth:
     post:
       description: Доступно без авторизации. Получение JWT токена по данным пользователя
@@ -519,10 +519,10 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorMessageResponse'
           description: Внутренняя ошибка сервера
-      security: []
+      security: [ ]
       summary: Авторизация пользователя и получение JWT
       tags:
-      - Users
+        - Users
   /events:
     post:
       description: "Учтите валидацию всех полей. Все поля обязательные при создани\
@@ -597,7 +597,7 @@ paths:
           description: Внутренняя ошибка сервера
       summary: "Создание нового мероприятия. Allowed roles=[USER]"
       tags:
-      - Events
+        - Events
   /events/{eventId}:
     delete:
       description: "Доступно только ADMIN, либо создателю мероприятия. Т.е. роль и\
@@ -607,14 +607,14 @@ paths:
         \ При этом нужно учесть то, что не каждое мероприятие можно отменить (можн\
         о отменить только те мероприятия, которые еще не начались)."
       parameters:
-      - description: Уникальный идентификатор мероприятия
-        in: path
-        name: eventId
-        required: true
-        schema:
-          example: 10
-          format: int64
-          type: integer
+        - description: Уникальный идентификатор мероприятия
+          in: path
+          name: eventId
+          required: true
+          schema:
+            example: 10
+            format: int64
+            type: integer
       responses:
         "204":
           description: Мероприятие успешно удалено
@@ -671,18 +671,18 @@ paths:
           description: Внутренняя ошибка сервера
       summary: "Удаление мероприятия. Allowed roles=[USER, ADMIN]"
       tags:
-      - Events
+        - Events
     get:
       description: "Предусмотрите обработку ошибок, если мероприятие не найдено."
       parameters:
-      - description: Уникальный идентификатор мероприятия
-        in: path
-        name: eventId
-        required: true
-        schema:
-          example: 10
-          format: int64
-          type: integer
+        - description: Уникальный идентификатор мероприятия
+          in: path
+          name: eventId
+          required: true
+          schema:
+            example: 10
+            format: int64
+            type: integer
       responses:
         "200":
           content:
@@ -743,7 +743,7 @@ paths:
           description: Внутренняя ошибка сервера
       summary: "Получение мероприятия по ID. Allowed roles=[USER, ADMIN]"
       tags:
-      - Events
+        - Events
     put:
       description: "Доступно только ADMIN, либо создателю мероприятия. Т.е. роль и\
         з JWT токена должна быть ADMIN, либо userId должен быть равен создателю ме\
@@ -751,14 +751,14 @@ paths:
         чения, например maxPlaces должно быть больше, чем уже записанных пользоват\
         елей, стоимость > 0, длительность > 0 и т.д."
       parameters:
-      - description: Уникальный идентификатор мероприятия
-        in: path
-        name: eventId
-        required: true
-        schema:
-          example: 10
-          format: int64
-          type: integer
+        - description: Уникальный идентификатор мероприятия
+          in: path
+          name: eventId
+          required: true
+          schema:
+            example: 10
+            format: int64
+            type: integer
       requestBody:
         content:
           application/json:
@@ -825,7 +825,7 @@ paths:
           description: Внутренняя ошибка сервера
       summary: "Обновление мероприятия. Allowed roles=[USER, ADMIN]"
       tags:
-      - Events
+        - Events
   /events/search:
     post:
       description: Поиск всех мероприятий по фильтру
@@ -897,7 +897,7 @@ paths:
           description: Внутренняя ошибка сервера
       summary: "Поиск мероприятий по фильтру. Allowed roles=[USER, ADMIN]"
       tags:
-      - Events
+        - Events
   /events/my:
     get:
       description: "Все мероприятия созданные пользователем, который выполняет зап\
@@ -944,21 +944,21 @@ paths:
       summary: "Получение всех мероприятий, созданных текущим пользователем. Allowed\
         \ roles=[USER]"
       tags:
-      - Events
+        - Events
   /events/registrations/{eventId}:
     post:
       description: "Необходимо учесть, что статус мероприятия должен позволять рег\
         истрацию. Можно зарегестрироваться только на мероприятие, которое не закон\
         очилось и не отменено."
       parameters:
-      - description: Уникальный идентификатор мероприятия
-        in: path
-        name: eventId
-        required: true
-        schema:
-          example: 10
-          format: int64
-          type: integer
+        - description: Уникальный идентификатор мероприятия
+          in: path
+          name: eventId
+          required: true
+          schema:
+            example: 10
+            format: int64
+            type: integer
       responses:
         "200":
           description: Успешная регистрация на мероприятие
@@ -1015,20 +1015,20 @@ paths:
           description: Внутренняя ошибка сервера
       summary: "Регистрация пользователя на мероприятие по ID. Allowed roles=[USER]"
       tags:
-      - Events
+        - Events
   /events/registrations/cancel/{eventId}:
     delete:
       description: "Необходимо учесть статус мероприятия. Нельзя отменить регистра\
         цию, если мероприятие уже началось или закончилось."
       parameters:
-      - description: Уникальный идентификатор мероприятия
-        in: path
-        name: eventId
-        required: true
-        schema:
-          example: 10
-          format: int64
-          type: integer
+        - description: Уникальный идентификатор мероприятия
+          in: path
+          name: eventId
+          required: true
+          schema:
+            example: 10
+            format: int64
+            type: integer
       responses:
         "204":
           description: Успешная отмена регистрации на мероприятие
@@ -1085,7 +1085,7 @@ paths:
           description: Внутренняя ошибка сервера
       summary: "Отмена регистрации на мероприятие. Allowed roles=[USER]"
       tags:
-      - Events
+        - Events
   /events/registrations/my:
     get:
       description: "Все мероприятия на которые записан пользователь. Мероприятия д\
@@ -1133,7 +1133,7 @@ paths:
       summary: "Получение мероприятий, на которые зарегистрирован текущий пользова\
         тель. Allowed roles=[USER]"
       tags:
-      - Events
+        - Events
 components:
   parameters:
     locationId:
@@ -1233,9 +1233,9 @@ components:
           format: date-time
           type: string
       required:
-      - dateTime
-      - detailedMessage
-      - message
+        - dateTime
+        - detailedMessage
+        - message
       type: object
     EventLocation:
       example:
@@ -1264,9 +1264,9 @@ components:
           description: Дополнительное описание локации
           type: string
       required:
-      - address
-      - capacity
-      - name
+        - address
+        - capacity
+        - name
       type: object
     User:
       description: Данные пользователя
@@ -1290,14 +1290,14 @@ components:
         role:
           description: Роль пользователя
           enum:
-          - ADMIN
-          - USER
+            - ADMIN
+            - USER
           type: string
       required:
-      - age
-      - id
-      - login
-      - role
+        - age
+        - id
+        - login
+        - role
       type: object
     UserRegistration:
       description: Данные для регистрации пользователя
@@ -1317,9 +1317,9 @@ components:
           minimum: 18
           type: int
       required:
-      - age
-      - login
-      - password
+        - age
+        - login
+        - password
       type: object
     JwtResponse:
       example:
@@ -1343,8 +1343,8 @@ components:
           description: Пароль пользователя
           type: string
       required:
-      - login
-      - password
+        - login
+        - password
       type: object
     EventDto:
       example:
@@ -1399,15 +1399,15 @@ components:
         status:
           $ref: '#/components/schemas/EventStatus'
       required:
-      - cost
-      - date
-      - duration
-      - id
-      - locationId
-      - maxPlaces
-      - name
-      - occupiedPlaces
-      - ownerId
+        - cost
+        - date
+        - duration
+        - id
+        - locationId
+        - maxPlaces
+        - name
+        - occupiedPlaces
+        - ownerId
       type: object
     EventStatus:
       description: |-
@@ -1417,10 +1417,10 @@ components:
         * CANCELLED - мероприятие отменено организтором. Новые регистрации недоступны на мероприятие.
         * FINISHED - мероприятие окончилось. Новые регистрации недоступны на мероприятие.
       enum:
-      - WAIT_START
-      - STARTED
-      - CLOSED
-      - FINISHED
+        - WAIT_START
+        - STARTED
+        - CLOSED
+        - FINISHED
       example: WAIT_START
       type: string
     EventCreateRequestDto:
@@ -1460,12 +1460,12 @@ components:
           example: 10
           type: integer
       required:
-      - cost
-      - date
-      - duration
-      - locationId
-      - maxPlaces
-      - name
+        - cost
+        - date
+        - duration
+        - locationId
+        - maxPlaces
+        - name
       type: object
     EventUpdateRequestDto:
       description: Объект с данными для обновления мероприятия

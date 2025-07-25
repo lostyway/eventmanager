@@ -1,3 +1,6 @@
+server:
+  port: 8081
+
 spring:
   application:
     name: eventmanager
@@ -5,9 +8,9 @@ spring:
     enabled: true
     change-log: db/changelog/master.xml
   datasource:
-    url: jdbc:postgresql://localhost:5433/eventmanagerdb
-    username: postgres
-    password: pass
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
     hikari:
       max-lifetime: 1_800_000
       maximum-pool-size: 20
