@@ -61,7 +61,9 @@ services:
       - "5434:5432"
     networks:
       - event-net
+      
   zookeeper:
+    container_name: zookeeper
     image: confluentinc/cp-zookeeper:7.4.4
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
@@ -69,9 +71,12 @@ services:
     ports:
       - 22181:2181
     restart: unless-stopped
+    networks:
+      event-net:
 
   kafka:
     image: confluentinc/cp-kafka:7.4.4
+    container_name: kafka
     depends_on:
       - zookeeper
     ports:
@@ -84,6 +89,8 @@ services:
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
     restart: unless-stopped
+    networks:
+      event-net:
 
 volumes:
   eventmanager-data:

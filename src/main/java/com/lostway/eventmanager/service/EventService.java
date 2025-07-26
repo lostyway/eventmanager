@@ -10,6 +10,8 @@ import com.lostway.eventmanager.repository.entity.EventEntity;
 import com.lostway.eventmanager.repository.entity.LocationEntity;
 import com.lostway.eventmanager.repository.entity.UserEntity;
 import com.lostway.eventmanager.repository.entity.UserEventRegistrationEntity;
+import com.lostway.eventmanager.service.kafka.EventChangeKafkaMessage;
+import com.lostway.eventmanager.service.kafka.EventKafkaProducer;
 import com.lostway.eventmanager.service.model.Event;
 import com.lostway.eventmanager.service.model.Location;
 import jakarta.validation.constraints.Positive;
@@ -32,6 +34,7 @@ public class EventService {
     private final UserService userService;
     private final EventValidatorService eventValidatorService;
     private final UserEventRegistrationEntityRepository userEventRegistrationEntityRepository;
+    private final EventKafkaProducer eventKafkaProducer;
 
     public Event createNewEvent(Event eventToCreate) {
         Location location = locationService.findById(eventToCreate.getLocationId());
@@ -146,6 +149,12 @@ public class EventService {
         validateNewEventFields(oldEntity, newEntity);
 
         EventEntity saved = repository.save(newEntity);
+        eventKafkaProducer.sendEventChanges(
+                new EventChangeKafkaMessage()
+                        .setEventId(saved.getId())
+                        .setName(saved.getName())
+                        .setStatus(saved.getStatus().toString())
+        );
         return mapper.toModel(saved);
     }
 
