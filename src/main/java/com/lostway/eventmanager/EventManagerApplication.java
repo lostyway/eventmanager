@@ -10,6 +10,6 @@ public class EventManagerApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(EventManagerApplication.class, args);
-        log.info("Application started: http://localhost:8080/swagger-ui.html");
+        log.info("Application started: http://localhost:8081/swagger-ui/index.html");
     }
 }

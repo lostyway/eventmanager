@@ -2,8 +2,10 @@ server:
   port: 8081
 
 spring:
+  application:
+    name: eventmanager
+
   kafka:
-    bootstrap-servers: kafka:9092
     consumer:
       group-id: notification-group
       auto-offset-reset: earliest
@@ -15,18 +17,9 @@ spring:
     admin:
       auto-create: true
 
-  application:
-    name: eventmanager
   liquibase:
     enabled: true
     change-log: db/changelog/master.xml
-  datasource:
-    url: ${SPRING_DATASOURCE_URL}
-    username: ${SPRING_DATASOURCE_USERNAME}
-    password: ${SPRING_DATASOURCE_PASSWORD}
-    hikari:
-      max-lifetime: 1_800_000
-      maximum-pool-size: 20
   jpa:
     hibernate:
       ddl-auto: none
@@ -39,7 +32,10 @@ spring:
           batch_versioned_data: true
         order_inserts: true
         order_updates: true
-
+  datasource:
+    hikari:
+      max-lifetime: 1_800_000
+      maximum-pool-size: 20
 
 logging:
   level:
