@@ -1,4 +1,4 @@
-package com.lostway.eventmanager.service.kafka;
+package com.lostway.eventmanager.config;
 
 import org.apache.kafka.clients.admin.NewTopic;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,11 +23,12 @@ public class KafkaTopicConfig {
     }
 
     @Bean
-    public NewTopic eventChangesTopic() {
+    public NewTopic createTopic() {
         return TopicBuilder
-                .name("event_changes")
-                .partitions(1)
-                .replicas(1)
+                .name("event-changes")
+                .partitions(3)
+                .replicas(3)
+                .configs(Map.of("min.insync.replicas", "2"))
                 .build();
     }
 }

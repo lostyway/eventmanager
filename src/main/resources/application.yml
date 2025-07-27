@@ -4,6 +4,8 @@ server:
 spring:
   application:
     name: eventmanager
+  profiles:
+    active: docker
 
   kafka:
     consumer:
@@ -14,8 +16,11 @@ spring:
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      retries: 3
+      acks: all
     admin:
       auto-create: true
+
 
   liquibase:
     enabled: true
@@ -34,7 +39,7 @@ spring:
         order_updates: true
   datasource:
     hikari:
-      max-lifetime: 1_800_000
+      max-lifetime: 300000
       maximum-pool-size: 20
 
 logging:

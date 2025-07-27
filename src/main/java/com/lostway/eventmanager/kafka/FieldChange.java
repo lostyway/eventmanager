@@ -1,4 +1,4 @@
-package com.lostway.eventmanager.service.kafka;
+package com.lostway.eventmanager.kafka;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

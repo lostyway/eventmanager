@@ -12,6 +12,9 @@ services:
       SPRING_DATASOURCE_PASSWORD: password
     depends_on:
       - eventmanager-db
+      - kafka
+      - kafka-2
+      - kafka-3
     networks:
       - event-net
     restart: unless-stopped
@@ -42,8 +45,12 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://event-notificator-db:5432/eventnotificator
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: password
+    restart: unless-stopped
     depends_on:
       - event-notificator-db
+      - kafka
+      - kafka-2
+      - kafka-3
     networks:
       - event-net
 
@@ -61,7 +68,7 @@ services:
       - "5434:5432"
     networks:
       - event-net
-      
+
   zookeeper:
     container_name: zookeeper
     image: confluentinc/cp-zookeeper:7.4.4
@@ -87,10 +94,52 @@ services:
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
+      KAFKA_MIN_INSYNC_REPLICAS: 2
+      KAFKA_DEFAULT_REPLICATION_FACTOR: 3
     restart: unless-stopped
     networks:
       event-net:
+
+  kafka-2:
+    image: confluentinc/cp-kafka:7.4.4
+    container_name: kafka-2
+    depends_on:
+      - zookeeper
+    ports:
+      - "29093:29093"
+    environment:
+      KAFKA_BROKER_ID: 2
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-2:9093,PLAINTEXT_HOST://localhost:29093
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
+      KAFKA_MIN_INSYNC_REPLICAS: 2
+      KAFKA_DEFAULT_REPLICATION_FACTOR: 3
+      restart: unless-stopped
+    networks:
+      - event-net
+
+  kafka-3:
+    image: confluentinc/cp-kafka:7.4.4
+    container_name: kafka-3
+    depends_on:
+      - zookeeper
+    ports:
+      - "29094:29094"
+    environment:
+      KAFKA_BROKER_ID: 3
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-3:9094,PLAINTEXT_HOST://localhost:29094
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
+      KAFKA_MIN_INSYNC_REPLICAS: 2
+      KAFKA_DEFAULT_REPLICATION_FACTOR: 3
+      restart: unless-stopped
+    networks:
+      - event-net
 
 volumes:
   eventmanager-data:

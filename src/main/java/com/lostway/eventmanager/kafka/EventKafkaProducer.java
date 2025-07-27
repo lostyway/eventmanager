@@ -1,4 +1,4 @@
-package com.lostway.eventmanager.service.kafka;
+package com.lostway.eventmanager.kafka;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class EventKafkaProducer {
     private final KafkaTemplate<String, EventChangeKafkaMessage> kafkaTemplate;
-    private static final String TOPIC = "event_changes";
+    private static final String TOPIC = "event-changes";
 
     public void sendEventChanges(EventChangeKafkaMessage message) {
         kafkaTemplate.send(TOPIC, message)
