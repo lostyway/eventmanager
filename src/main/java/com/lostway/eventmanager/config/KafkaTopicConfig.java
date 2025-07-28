@@ -23,9 +23,19 @@ public class KafkaTopicConfig {
     }
 
     @Bean
-    public NewTopic createTopic() {
+    public NewTopic createEventChangeTopic() {
         return TopicBuilder
                 .name("event-changes")
+                .partitions(3)
+                .replicas(3)
+                .configs(Map.of("min.insync.replicas", "2"))
+                .build();
+    }
+
+    @Bean
+    public NewTopic createEventStatusChangeTopic() {
+        return TopicBuilder
+                .name("event-status-changes")
                 .partitions(3)
                 .replicas(3)
                 .configs(Map.of("min.insync.replicas", "2"))

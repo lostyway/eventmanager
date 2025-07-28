@@ -1,11 +1,13 @@
 package com.lostway.eventmanager.scheduler;
 
 import com.lostway.eventmanager.IntegrationTestBase;
+import com.lostway.eventmanager.kafka.EventKafkaProducer;
 import com.lostway.eventmanager.repository.EventRepository;
 import com.lostway.eventmanager.repository.entity.EventEntity;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.Clock;
@@ -23,6 +25,8 @@ class EventStatusSchedulerTest extends IntegrationTestBase {
 
     private EventStatusScheduler scheduler;
 
+    private EventKafkaProducer mockProducer = Mockito.mock(EventKafkaProducer.class);
+
     private EventEntity event1; // Началось 5 минут назад
     private EventEntity event2; // Уже закончилось 1 минуту назад
     private EventEntity event3; // Еще не началось
@@ -37,7 +41,7 @@ class EventStatusSchedulerTest extends IntegrationTestBase {
                 ZonedDateTime.of(2025, 7, 19, 15, 0, 0, 0, ZoneId.of("Europe/Moscow")).toInstant(),
                 ZoneId.of("Europe/Moscow")
         );
-        scheduler = new EventStatusScheduler(repository, clock);
+        scheduler = new EventStatusScheduler(repository, clock, mockProducer);
 
         event1 = EventEntity.builder()
                 .name("testEvent")

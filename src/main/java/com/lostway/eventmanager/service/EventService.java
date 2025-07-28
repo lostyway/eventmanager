@@ -21,6 +21,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Clock;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Objects;
 
@@ -28,6 +31,7 @@ import java.util.Objects;
 @RequiredArgsConstructor
 @Transactional
 public class EventService {
+    private final Clock clock = Clock.system(ZoneId.of("Europe/Moscow"));
     private final EventRepository repository;
     private final LocationService locationService;
     private final EventMapper mapper;
@@ -135,6 +139,11 @@ public class EventService {
     }
 
     public Event updateEvent(Integer eventId, Event model) {
+        LocalDateTime zoneTimeNow = LocalDateTime.now(clock);
+        if (model.getDate().isBefore(zoneTimeNow)) {
+            throw new EventTimeInPastException("Новое время мероприятия указано в прошлом!");
+        }
+
         model.setId(eventId);
         EventEntity oldEntity = validateAndGetEventEntity(eventId);
         LocationEntity location = locationService.getLocationFromDb(model.getLocationId());
