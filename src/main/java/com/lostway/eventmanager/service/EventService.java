@@ -5,6 +5,7 @@ import com.lostway.eventmanager.enums.EventStatus;
 import com.lostway.eventmanager.exception.*;
 import com.lostway.eventmanager.kafka.EventChangeKafkaMessage;
 import com.lostway.eventmanager.kafka.EventKafkaProducer;
+import com.lostway.eventmanager.kafka.FieldChange;
 import com.lostway.eventmanager.mapper.EventMapper;
 import com.lostway.eventmanager.repository.EventRepository;
 import com.lostway.eventmanager.repository.UserEventRegistrationEntityRepository;
@@ -139,13 +140,43 @@ public class EventService {
     }
 
     public Event updateEvent(Long eventId, Event model) {
-        LocalDateTime zoneTimeNow = LocalDateTime.now(clock);
-        if (model.getDate().isBefore(zoneTimeNow)) {
+
+        if (model.getDate().isBefore(LocalDateTime.now(clock))) {
             throw new EventTimeInPastException("Новое время мероприятия указано в прошлом!");
         }
 
-        model.setId(eventId);
         EventEntity oldEntity = validateAndGetEventEntity(eventId);
+        Event oldEvent = mapper.toModel(oldEntity);
+        EventEntity newEntity = createNewEntity(model, oldEntity);
+
+        EventEntity saved = repository.save(newEntity);
+        saveKafkaChangeLogToEventNotificator(saved, oldEvent, newEntity, oldEntity);
+
+        return mapper.toModel(saved);
+    }
+
+    public List<Event> searchEventByFilter(EventSearchRequestDto eventSearchRequestDto) {
+        List<EventEntity> entityList = repository.parseAndFindByFilter(eventSearchRequestDto);
+        return mapper.toModel(entityList);
+    }
+
+    private void saveKafkaChangeLogToEventNotificator(EventEntity saved, Event oldEvent, EventEntity newEntity, EventEntity oldEntity) {
+        eventKafkaProducer.sendEventChanges(
+                new EventChangeKafkaMessage()
+                        .setEventId(saved.getId())
+                        .setChangedById(getSecurityUserId())
+                        .setName(new FieldChange<>(oldEvent.getName(), newEntity.getName()))
+                        .setMaxPlaces(new FieldChange<>(oldEvent.getMaxPlaces(), newEntity.getMaxPlaces()))
+                        .setDate(new FieldChange<>(oldEvent.getDate(), newEntity.getDate()))
+                        .setCost(new FieldChange<>(oldEvent.getCost(), newEntity.getCost()))
+                        .setDuration(new FieldChange<>(oldEvent.getDuration(), newEntity.getDuration()))
+                        .setLocationId(new FieldChange<>(oldEvent.getLocationId(), newEntity.getLocation().getId()))
+                        .setStatus(new FieldChange<>(oldEvent.getStatus(), newEntity.getStatus()))
+                        .setUsers(userEventRegistrationEntityRepository.findUserIdsByEventId(oldEntity.getId()))
+        );
+    }
+
+    private EventEntity createNewEntity(Event model, EventEntity oldEntity) {
         LocationEntity location = locationService.getLocationFromDb(model.getLocationId());
         UserEntity userEntity = userService.getUserByIdForUser(getSecurityUserId());
 
@@ -154,22 +185,9 @@ public class EventService {
         newEntity.setLocation(location);
         newEntity.setStatus(EventStatus.WAIT_START);
         newEntity.setOccupiedPlaces(oldEntity.getOccupiedPlaces());
-
         validateNewEventFields(oldEntity, newEntity);
 
-        EventEntity saved = repository.save(newEntity);
-        eventKafkaProducer.sendEventChanges(
-                new EventChangeKafkaMessage()
-                        .setEventId(saved.getId())
-                        .setName(saved.getName())
-                        .setStatus(saved.getStatus().toString())
-        );
-        return mapper.toModel(saved);
-    }
-
-    public List<Event> searchEventByFilter(EventSearchRequestDto eventSearchRequestDto) {
-        List<EventEntity> entityList = repository.parseAndFindByFilter(eventSearchRequestDto);
-        return mapper.toModel(entityList);
+        return newEntity;
     }
 
     private static void validateNewEventFields(EventEntity oldEntity, EventEntity newEntity) {

@@ -54,7 +54,7 @@ class EventServiceTest extends IntegrationTestBase {
                 null,
                 "event name",
                 10,
-                LocalDateTime.of(2025, 12, 11, 0, 0), 100, 0, 30,
+                LocalDateTime.of(2025, 12, 11, 0, 0), 100.0, 0, 30,
                 locationEntity.getId(),
                 user.getId(),
                 WAIT_START);
@@ -173,7 +173,7 @@ class EventServiceTest extends IntegrationTestBase {
                     null,
                     "event name2",
                     20,
-                    LocalDateTime.of(2025, 12, 11, 0, 0), 100, 0, 30,
+                    LocalDateTime.of(2025, 12, 11, 0, 0), 100.0, 0, 30,
                     locationEntity2.getId(),
                     user.getId(),
                     WAIT_START);

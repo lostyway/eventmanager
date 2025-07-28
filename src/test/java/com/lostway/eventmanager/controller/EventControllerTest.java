@@ -98,7 +98,7 @@ class EventControllerTest {
         event = Event.builder()
                 .id(1L)
                 .name("Test Event")
-                .cost(100)
+                .cost(100.0)
                 .date(LocalDateTime.of(25, 2, 3, 12, 0))
                 .duration(30)
                 .locationId(1L)
@@ -185,7 +185,7 @@ class EventControllerTest {
     @Test
     void whenUpdateEventIsSuccessful() throws Exception {
         Event newEvent = new Event(1L, "newName", 10, LocalDateTime.now(),
-                100, 5, 30, 1L, 1L, EventStatus.WAIT_START);
+                100.0, 5, 30, 1L, 1L, EventStatus.WAIT_START);
         when(eventService.updateEvent(eq(event.getId()), any(Event.class))).thenReturn(newEvent);
         mockMvc.perform(put("/events/{eventId}", event.getId())
                         .contentType(MediaType.APPLICATION_JSON)

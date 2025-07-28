@@ -21,7 +21,7 @@ public class Event {
 
     private LocalDateTime date;
 
-    private Integer cost;
+    private Double cost;
 
     private int occupiedPlaces;
 
