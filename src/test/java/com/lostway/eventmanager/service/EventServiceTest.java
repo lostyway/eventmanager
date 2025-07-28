@@ -122,29 +122,44 @@ class EventServiceTest extends IntegrationTestBase {
 
         @Test
         void whenRegisterNewEventIsSuccessful() {
-            eventService.registerNewEvent(temp.getId());
+            eventService.registerUserToEvent(temp.getId());
             int countOfMembers = eventService.getUsersEvents().getFirst().getOccupiedPlaces();
             assertThat(countOfMembers).isEqualTo(1);
         }
 
         @Test
         void whenRepeatRegisterThenFailed() {
-            eventService.registerNewEvent(temp.getId());
+            eventService.registerUserToEvent(temp.getId());
             int countOfMembers = eventService.getUsersEvents().getFirst().getOccupiedPlaces();
             assertThat(countOfMembers).isEqualTo(1);
-            Exception exception = assertThrows(AlreadyRegisteredException.class, () -> eventService.registerNewEvent(temp.getId()));
+            Exception exception = assertThrows(AlreadyRegisteredException.class, () -> eventService.registerUserToEvent(temp.getId()));
             assertThat(exception).hasMessageContaining("Пользователь уже зарегистрирован на это мероприятие.");
         }
 
         @Test
+        void whenRegisterFailedByMaxPlaces() {
+            eventService.cancelEventById(temp.getId());
+            Event created = eventService.createNewEvent(event);
+
+            var entity = eventRepository.findEventById(created.getId()).orElseThrow();
+            entity.setOccupiedPlaces(created.getMaxPlaces());
+            eventRepository.save(entity);
+
+            Exception exception = assertThrows(NotEnoughPlaceException.class, () ->
+                    eventService.registerUserToEvent(created.getId()));
+
+            assertThat(exception).hasMessageContaining("Недостаточно мест на мероприятии для бронирования");
+        }
+
+        @Test
         void whenRegisterNewEventIsFailedByBadEventId() {
-            Exception exception = assertThrows(EventNotFoundException.class, () -> eventService.registerNewEvent(-1L));
+            Exception exception = assertThrows(EventNotFoundException.class, () -> eventService.registerUserToEvent(-1L));
             assertThat(exception).hasMessageContaining("не было найдено");
         }
 
         @Test
         void whenDeleteEventRegistrationIsSuccessful() {
-            eventService.registerNewEvent(temp.getId());
+            eventService.registerUserToEvent(temp.getId());
             eventService.deleteEventRegistration(temp.getId());
             int countOfMembers = eventService.getUsersEvents().getFirst().getOccupiedPlaces();
             assertThat(countOfMembers).isZero();
@@ -152,7 +167,7 @@ class EventServiceTest extends IntegrationTestBase {
 
         @Test
         void whenDeleteEventRegistrationIsSuccessfulCheckMembers() {
-            eventService.registerNewEvent(temp.getId());
+            eventService.registerUserToEvent(temp.getId());
             int countOfMembers = eventService.getUsersEvents().getFirst().getOccupiedPlaces();
             assertThat(countOfMembers).isEqualTo(1);
             eventService.deleteEventRegistration(temp.getId());
@@ -162,7 +177,7 @@ class EventServiceTest extends IntegrationTestBase {
 
         @Test
         void whenGetUserRegistrationsOnEventsThenOne() {
-            eventService.registerNewEvent(temp.getId());
+            eventService.registerUserToEvent(temp.getId());
             var events = eventService.getUserRegistrationsOnEvents();
             assertThat(events).hasSize(1);
         }
@@ -179,29 +194,29 @@ class EventServiceTest extends IntegrationTestBase {
                     WAIT_START);
 
             newEvent = eventService.createNewEvent(newEvent);
-            eventService.registerNewEvent(temp.getId());
+            eventService.registerUserToEvent(temp.getId());
             var events = eventService.getUserRegistrationsOnEvents();
             assertThat(events).hasSize(1);
-            eventService.registerNewEvent(newEvent.getId());
+            eventService.registerUserToEvent(newEvent.getId());
             var eventsTwo = eventService.getUserRegistrationsOnEvents();
             assertThat(eventsTwo).hasSize(2);
         }
     }
 
     @Test
-    void whenRegisterNewEventIsFailedByBadStatus() {
+    void whenRegisterUserToEventIsFailedByBadStatus() {
         event = eventService.createNewEvent(event);
         event.setStatus(STARTED);
         eventRepository.save(eventMapper.toEntity(event));
-        Exception exception = assertThrows(EventAlreadyStartedException.class, () -> eventService.registerNewEvent(event.getId()));
+        Exception exception = assertThrows(EventAlreadyStartedException.class, () -> eventService.registerUserToEvent(event.getId()));
         assertThat(exception).hasMessageContaining("Регистрация на мероприятие уже закрыто.");
     }
 
     @Test
-    void whenRegisterNewEventIsFailedByCapacity() {
+    void whenRegisterUserToEventIsFailedByCapacity() {
         event.setOccupiedPlaces(1000);
         event = eventService.createNewEvent(event);
-        Exception exception = assertThrows(NotEnoughPlaceException.class, () -> eventService.registerNewEvent(event.getId()));
+        Exception exception = assertThrows(NotEnoughPlaceException.class, () -> eventService.registerUserToEvent(event.getId()));
         assertThat(exception).hasMessageContaining("Недостаточно мест на мероприятии для бронирования");
     }
 

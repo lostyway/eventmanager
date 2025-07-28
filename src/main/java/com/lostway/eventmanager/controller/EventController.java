@@ -40,7 +40,7 @@ public class EventController {
 
     @PostMapping("/registrations/{eventId}")
     public ResponseEntity<String> registerNewEvent(@PathVariable @Positive Long eventId) {
-        eventService.registerNewEvent(eventId);
+        eventService.registerUserToEvent(eventId);
         return ResponseEntity.status(HttpStatus.OK).body("Успешная регистрация на мероприятие");
     }
 

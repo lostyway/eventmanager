@@ -69,7 +69,7 @@ public class EventService {
         return userService.findByLogin(username).getId();
     }
 
-    public void registerNewEvent(@Positive Long eventId) {
+    public void registerUserToEvent(@Positive Long eventId) {
         EventEntity eventEntity = repository.findEventById(eventId)
                 .orElseThrow(() -> new EventNotFoundException(eventId));
 
@@ -93,12 +93,9 @@ public class EventService {
             throw new NotEnoughPlaceException("Недостаточно мест на мероприятии для бронирования");
         }
 
-        UserEventRegistrationEntity registration = new UserEventRegistrationEntity();
-        registration.setUser(userEntity);
-        registration.setEvent(eventEntity);
-
         eventEntity.setOccupiedPlaces(placeToBuy);
-        userEventRegistrationEntityRepository.save(registration);
+
+        createUserEventRegistration(userEntity, eventEntity);
         repository.save(eventEntity);
     }
 
@@ -211,5 +208,12 @@ public class EventService {
         }
 
         return eventEntity;
+    }
+
+    private void createUserEventRegistration(UserEntity userEntity, EventEntity eventEntity) {
+        UserEventRegistrationEntity registration = new UserEventRegistrationEntity();
+        registration.setUser(userEntity);
+        registration.setEvent(eventEntity);
+        userEventRegistrationEntityRepository.save(registration);
     }
 }
