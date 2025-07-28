@@ -131,7 +131,7 @@ class LocationServiceTest extends IntegrationTestBase {
         service.createLocation(location);
 
         Exception exception = assertThrows(LocationNotFoundException.class,
-                () -> service.updateLocation(999, newSecondLocation));
+                () -> service.updateLocation(999L, newSecondLocation));
 
         assertThat(exception).hasMessageContaining("Локация для удаления");
     }

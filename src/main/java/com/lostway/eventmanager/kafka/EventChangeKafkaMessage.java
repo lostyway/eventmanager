@@ -7,7 +7,7 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class EventChangeKafkaMessage {
 
-    private Integer eventId;
+    private Long eventId;
     private String name;
     private String status;
 

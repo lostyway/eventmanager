@@ -39,13 +39,13 @@ public class EventController {
     }
 
     @PostMapping("/registrations/{eventId}")
-    public ResponseEntity<String> registerNewEvent(@PathVariable @Positive Integer eventId) {
+    public ResponseEntity<String> registerNewEvent(@PathVariable @Positive Long eventId) {
         eventService.registerNewEvent(eventId);
         return ResponseEntity.status(HttpStatus.OK).body("Успешная регистрация на мероприятие");
     }
 
     @DeleteMapping("/registrations/cancel/{eventId}")
-    public ResponseEntity<String> cancelEvent(@PathVariable @Positive Integer eventId) {
+    public ResponseEntity<String> cancelEvent(@PathVariable @Positive Long eventId) {
         eventService.deleteEventRegistration(eventId);
         return ResponseEntity.noContent().build();
     }
@@ -57,20 +57,23 @@ public class EventController {
     }
 
     @GetMapping("/{eventId}")
-    public ResponseEntity<EventDto> getEventById(@PathVariable @Positive Integer eventId) {
+    public ResponseEntity<EventDto> getEventById(@PathVariable @Positive Long eventId) {
         Event event = eventService.getEventById(eventId);
         EventDto result = mapper.toDto(event);
         return ResponseEntity.ok(result);
     }
 
     @DeleteMapping("/{eventId}")
-    public ResponseEntity<Void> deleteEventById(@PathVariable @Positive Integer eventId) {
+    public ResponseEntity<Void> deleteEventById(@PathVariable @Positive Long eventId) {
         eventService.cancelEventById(eventId);
         return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/{eventId}")
-    public ResponseEntity<EventDto> updateEvent(@RequestBody @Valid EventUpdateRequestDto eventUpdateRequestDto, @PathVariable @Positive Integer eventId) {
+    public ResponseEntity<EventDto> updateEvent(
+            @RequestBody @Valid EventUpdateRequestDto eventUpdateRequestDto,
+            @PathVariable @Positive Long eventId
+    ) {
         Event newEvent = eventService.updateEvent(eventId, mapper.toModel(eventUpdateRequestDto));
         EventDto result = mapper.toDto(newEvent);
         return ResponseEntity.ok(result);

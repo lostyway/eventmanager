@@ -15,7 +15,7 @@ import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface EventMapper {
-    
+
     Event toModel(EventCreateRequestDto eventCreateRequestDto);
 
     List<EventDto> toDto(List<Event> events);
@@ -43,7 +43,7 @@ public interface EventMapper {
     }
 
     @Named("mapLocation")
-    default LocationEntity mapLocation(Integer locationId) {
+    default LocationEntity mapLocation(Long locationId) {
         if (locationId == null) {
             return null;
         }

@@ -86,7 +86,7 @@ class EventServiceTest extends IntegrationTestBase {
 
     @Test
     void whenCreatingEventIsFailedByBadParamsInEvent() {
-        event.setLocationId(-1);
+        event.setLocationId(-1L);
 
         Exception exception = assertThrows(LocationNotFoundException.class, () -> eventService.createNewEvent(event));
         assertThat(exception).hasMessageContaining("не была найдена");
@@ -138,7 +138,7 @@ class EventServiceTest extends IntegrationTestBase {
 
         @Test
         void whenRegisterNewEventIsFailedByBadEventId() {
-            Exception exception = assertThrows(EventNotFoundException.class, () -> eventService.registerNewEvent(-1));
+            Exception exception = assertThrows(EventNotFoundException.class, () -> eventService.registerNewEvent(-1L));
             assertThat(exception).hasMessageContaining("не было найдено");
         }
 

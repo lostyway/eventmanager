@@ -46,7 +46,7 @@ public class LocationService {
      * @throws LocationNotFoundException  локация не была найдена
      */
     @Transactional
-    public Location removeById(Integer locationId) {
+    public Location removeById(Long locationId) {
         LocationEntity locationEntity = repository.findById(locationId)
                 .orElseThrow(() -> new LocationNotFoundException("Локация с ID: '%s' не была найдена".formatted(locationId)));
 
@@ -61,7 +61,7 @@ public class LocationService {
     }
 
     @Transactional
-    public Location findById(Integer locationId) {
+    public Location findById(Long locationId) {
         LocationEntity locationEntity = repository.findById(locationId)
                 .orElseThrow(() -> new LocationNotFoundException("Локация с ID: '%s' не была найдена".formatted(locationId)));
 
@@ -69,7 +69,7 @@ public class LocationService {
     }
 
     @Transactional
-    public Location updateLocation(Integer locationId, Location updateLocation) {
+    public Location updateLocation(Long locationId, Location updateLocation) {
         LocationEntity existing = repository.findById(locationId)
                 .orElseThrow(() -> new LocationNotFoundException("Локация для удаления: '%s' не была найдена.".formatted(locationId)));
 
@@ -84,7 +84,7 @@ public class LocationService {
     }
 
     @Transactional
-    public LocationEntity getLocationFromDb(Integer locationId) {
+    public LocationEntity getLocationFromDb(Long locationId) {
         return repository.findById(locationId)
                 .orElseThrow(() -> new LocationNotFoundException("Локация не найдена"));
     }

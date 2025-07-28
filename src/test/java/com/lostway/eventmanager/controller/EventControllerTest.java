@@ -62,7 +62,7 @@ class EventControllerTest {
 
     private EventDto createTestEventDto() {
         return new EventDto(
-                1,
+                1L,
                 "Test Event",
                 123L,
                 10,
@@ -70,7 +70,7 @@ class EventControllerTest {
                 LocalDateTime.now().plusDays(1),
                 1000,
                 60,
-                1,
+                1L,
                 EventStatus.WAIT_START
         );
     }
@@ -83,7 +83,7 @@ class EventControllerTest {
                 LocalDateTime.now().plusDays(2),
                 1500,
                 90,
-                2
+                2L
         );
 
         eventCreateRequestDto = new EventCreateRequestDto(
@@ -96,12 +96,12 @@ class EventControllerTest {
         );
 
         event = Event.builder()
-                .id(1)
+                .id(1L)
                 .name("Test Event")
                 .cost(100)
                 .date(LocalDateTime.of(25, 2, 3, 12, 0))
                 .duration(30)
-                .locationId(1)
+                .locationId(1L)
                 .maxPlaces(250)
                 .occupiedPlaces(0)
                 .ownerId(1L)
@@ -184,8 +184,8 @@ class EventControllerTest {
 
     @Test
     void whenUpdateEventIsSuccessful() throws Exception {
-        Event newEvent = new Event(1, "newName", 10, LocalDateTime.now(),
-                100, 5, 30, 1, 1L, EventStatus.WAIT_START);
+        Event newEvent = new Event(1L, "newName", 10, LocalDateTime.now(),
+                100, 5, 30, 1L, 1L, EventStatus.WAIT_START);
         when(eventService.updateEvent(eq(event.getId()), any(Event.class))).thenReturn(newEvent);
         mockMvc.perform(put("/events/{eventId}", event.getId())
                         .contentType(MediaType.APPLICATION_JSON)

@@ -67,17 +67,17 @@ class LocationControllerTest {
 
     @BeforeEach
     void init() {
-        locationDto = new LocationDto(1, "test", "address", 10, "desctest");
-        location = new Location(1, "test", "address", 10, "desctest");
+        locationDto = new LocationDto(1L, "test", "address", 10, "desctest");
+        location = new Location(1L, "test", "address", 10, "desctest");
         locationPage = new PageImpl<>(
-                List.of(new Location(1, "testloc", "addressTest", 20, "desc"),
-                        new Location(1, "testloc", "addressTest", 20, "desc")),
+                List.of(new Location(1L, "testloc", "addressTest", 20, "desc"),
+                        new Location(1L, "testloc", "addressTest", 20, "desc")),
                 PageRequest.of(0, 10),
                 2
         );
 
         locationToUpdateDto = new LocationDto(
-                0,
+                0L,
                 "testNameNew",
                 "addressNew",
                 locationDto.getCapacity() + 10,
@@ -136,7 +136,7 @@ class LocationControllerTest {
 
     @Test
     void whenCreationLocationIsFailedByBadDto() throws Exception {
-        LocationDto wrongDto = new LocationDto(1, "test", "address", 3, "desctest");
+        LocationDto wrongDto = new LocationDto(1L, "test", "address", 3, "desctest");
         mockMvc.perform(post("/locations")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(wrongDto)))
@@ -147,7 +147,7 @@ class LocationControllerTest {
 
     @Test
     void whenDeleteLocationIsSuccessful() throws Exception {
-        Integer id = locationDto.getId();
+        Long id = locationDto.getId();
         when(locationService.removeById(id)).thenReturn(location);
 
         mockMvc.perform(delete("/locations/" + id))
@@ -158,7 +158,7 @@ class LocationControllerTest {
 
     @Test
     void whenDeleteLocationIsWrongByWrongIdThenGetException() throws Exception {
-        Integer id = -1;
+        Long id = -1L;
         String errorMessage = "Локация с ID: '%s' не была найдена".formatted(id);
         when(locationService.removeById(id)).thenThrow(new LocationNotFoundException(errorMessage));
 
@@ -170,7 +170,7 @@ class LocationControllerTest {
 
     @Test
     void whenDeleteLocationIsWrongByLocationIsPlanned() throws Exception {
-        Integer id = -1;
+        Long id = -1L;
         String errorMessage = "Локация уже занята мероприятием";
         when(locationService.removeById(id)).thenThrow(new LocationIsPlannedException(errorMessage));
 
@@ -182,7 +182,7 @@ class LocationControllerTest {
 
     @Test
     void whenGetLocationByIdIsSuccessful() throws Exception {
-        Integer id = locationDto.getId();
+        Long id = locationDto.getId();
         when(locationService.findById(id)).thenReturn(location);
 
         mockMvc.perform(get("/locations/" + id))
@@ -193,7 +193,7 @@ class LocationControllerTest {
 
     @Test
     void whenGetLocationByIdIsFailedByBadId() throws Exception {
-        Integer id = -1;
+        Long id = -1L;
         String errorMessage = "Локация с ID: '%s' не была найдена".formatted(id);
         when(locationService.findById(id)).thenThrow(new LocationNotFoundException(errorMessage));
 

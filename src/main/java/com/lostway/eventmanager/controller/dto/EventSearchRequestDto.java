@@ -15,7 +15,7 @@ public record EventSearchRequestDto(
         Integer costMax,
         Integer durationMin,
         Integer durationMax,
-        Integer locationId,
+        Long locationId,
         EventStatus eventStatus
 ) {
 }

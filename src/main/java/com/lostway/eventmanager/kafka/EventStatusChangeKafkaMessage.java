@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @Accessors(chain = true)
 public class EventStatusChangeKafkaMessage {
 
-    private Integer eventId;
+    private Long eventId;
     private EventStatus status;
     private LocalDateTime timestamp;
 }

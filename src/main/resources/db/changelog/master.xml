@@ -10,7 +10,7 @@
         <sql>
             create table locations
             (
-                id          serial primary key,
+                id          bigserial primary key,
                 name        text not null,
                 address     text not null,
                 capacity    int  not null,
@@ -42,7 +42,7 @@
         <sql>
             create table events
             (
-                id              serial primary key,
+                id              bigserial primary key,
                 name            text,
                 owner_id        int references users (id),
                 max_places      int       not null,
@@ -50,7 +50,7 @@
                 date            timestamp not null,
                 cost            decimal   not null,
                 duration        int       not null,
-                location_id     int references locations (id),
+                location_id     bigint references locations (id),
                 status          text
             );
         </sql>
@@ -102,7 +102,7 @@
         <sql>
             create table user_event_registrations
             (
-                id       serial primary key,
+                id       bigserial primary key,
                 user_id  int references users (id),
                 event_id int references events (id)
             );

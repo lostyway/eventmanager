@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class Event {
-    private Integer id;
+    private Long id;
 
     private String name;
 
@@ -27,7 +27,7 @@ public class Event {
 
     private Integer duration;
 
-    private Integer locationId;
+    private Long locationId;
 
     private Long ownerId;
 

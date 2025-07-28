@@ -18,7 +18,7 @@ import static jakarta.persistence.LockModeType.PESSIMISTIC_READ;
 import static jakarta.persistence.LockModeType.PESSIMISTIC_WRITE;
 
 @Repository
-public interface EventRepository extends JpaRepository<EventEntity, Integer> {
+public interface EventRepository extends JpaRepository<EventEntity, Long> {
 
     boolean existsEventEntitiesByLocationAndStatusIn(LocationEntity location, List<EventStatus> statues);
 
@@ -26,7 +26,7 @@ public interface EventRepository extends JpaRepository<EventEntity, Integer> {
 
     @Query("select e from EventEntity e where e.id = :eventId")
     @Lock(PESSIMISTIC_WRITE)
-    Optional<EventEntity> findEventById(@Param("eventId") Integer id);
+    Optional<EventEntity> findEventById(@Param("eventId") Long id);
 
     List<EventEntity> findByStatusIn(List<EventStatus> statues);
 
@@ -54,7 +54,7 @@ public interface EventRepository extends JpaRepository<EventEntity, Integer> {
                                    @Param("costMax") Integer costMax,
                                    @Param("durationMin") Integer durationMin,
                                    @Param("durationMax") Integer durationMax,
-                                   @Param("locationId") Integer locationId,
+                                   @Param("locationId") Long locationId,
                                    @Param("eventStatus") EventStatus eventStatus
     );
 
@@ -70,7 +70,7 @@ public interface EventRepository extends JpaRepository<EventEntity, Integer> {
         Integer costMax = eventSearchRequestDto.costMax();
         Integer durationMin = eventSearchRequestDto.durationMin();
         Integer durationMax = eventSearchRequestDto.durationMax();
-        Integer locationId = eventSearchRequestDto.locationId();
+        Long locationId = eventSearchRequestDto.locationId();
         EventStatus eventStatus = eventSearchRequestDto.eventStatus();
 
         return findByFilter(

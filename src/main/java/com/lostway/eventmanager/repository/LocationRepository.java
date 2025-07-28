@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface LocationRepository extends JpaRepository<LocationEntity, Integer> {
+public interface LocationRepository extends JpaRepository<LocationEntity, Long> {
     boolean existsByNameAndAddressAndCapacity(String name, String address, Integer capacity);
 
     Page<LocationEntity> findAll(Pageable pageable);

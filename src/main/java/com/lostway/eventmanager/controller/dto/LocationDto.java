@@ -13,7 +13,7 @@ import lombok.*;
 @Builder
 public class LocationDto {
 
-    private Integer id;
+    private Long id;
 
     @NotBlank(message = "Название не может быть пустым")
     private String name;

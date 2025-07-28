@@ -7,7 +7,7 @@ import jakarta.validation.constraints.*;
 import java.time.LocalDateTime;
 
 public record EventDto(
-        @NotNull Integer id,
+        @NotNull Long id,
         @NotBlank String name,
         @NotBlank Long ownerId,
         @NotNull Integer maxPlaces,
@@ -15,7 +15,7 @@ public record EventDto(
         @Future @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") LocalDateTime date,
         @NotNull @Positive int cost,
         @NotNull @Min(30) Integer duration,
-        @NotNull Integer locationId,
+        @NotNull Long locationId,
         EventStatus status
 ) {
 }

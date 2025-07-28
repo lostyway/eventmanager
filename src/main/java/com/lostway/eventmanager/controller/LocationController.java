@@ -40,19 +40,19 @@ public class LocationController {
      * @return Локация которую удалили
      */
     @DeleteMapping("/{locationId}")
-    public ResponseEntity<LocationDto> deleteLocation(@PathVariable Integer locationId) {
+    public ResponseEntity<LocationDto> deleteLocation(@PathVariable Long locationId) {
         Location location = service.removeById(locationId);
         return ResponseEntity.ok(mapper.toDto(location));
     }
 
     @GetMapping("/{locationId}")
-    public ResponseEntity<LocationDto> getLocationById(@PathVariable Integer locationId) {
+    public ResponseEntity<LocationDto> getLocationById(@PathVariable Long locationId) {
         Location location = service.findById(locationId);
         return ResponseEntity.ok(mapper.toDto(location));
     }
 
     @PutMapping("/{locationId}")
-    public ResponseEntity<LocationDto> updateLocation(@PathVariable Integer locationId,
+    public ResponseEntity<LocationDto> updateLocation(@PathVariable Long locationId,
                                                       @RequestBody @Valid LocationDto dto) {
         Location updateLocation = mapper.toModel(dto);
         Location updated = service.updateLocation(locationId, updateLocation);

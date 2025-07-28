@@ -11,6 +11,6 @@ public record EventUpdateRequestDto(
         @Future @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") LocalDateTime date,
         @Positive int cost,
         @Min(30) Integer duration,
-        @Positive Integer locationId
+        @Positive Long locationId
 ) {
 }

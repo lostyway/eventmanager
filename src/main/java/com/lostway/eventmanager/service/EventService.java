@@ -68,7 +68,7 @@ public class EventService {
         return userService.findByLogin(username).getId();
     }
 
-    public void registerNewEvent(@Positive Integer eventId) {
+    public void registerNewEvent(@Positive Long eventId) {
         EventEntity eventEntity = repository.findEventById(eventId)
                 .orElseThrow(() -> new EventNotFoundException(eventId));
 
@@ -101,7 +101,7 @@ public class EventService {
         repository.save(eventEntity);
     }
 
-    public void deleteEventRegistration(@Positive Integer eventId) {
+    public void deleteEventRegistration(@Positive Long eventId) {
         EventEntity eventEntity = repository.findEventById(eventId)
                 .orElseThrow(() -> new EventNotFoundException(eventId));
 
@@ -128,17 +128,17 @@ public class EventService {
         return mapper.toModel(list);
     }
 
-    public Event getEventById(@Positive Integer eventId) {
+    public Event getEventById(@Positive Long eventId) {
         EventEntity event = repository.findEventById(eventId)
                 .orElseThrow(() -> new EventNotFoundException(eventId));
         return mapper.toModel(event);
     }
 
-    public void cancelEventById(@Positive Integer eventId) {
+    public void cancelEventById(@Positive Long eventId) {
         validateAndGetEventEntity(eventId).setStatus(EventStatus.CANCELLED);
     }
 
-    public Event updateEvent(Integer eventId, Event model) {
+    public Event updateEvent(Long eventId, Event model) {
         LocalDateTime zoneTimeNow = LocalDateTime.now(clock);
         if (model.getDate().isBefore(zoneTimeNow)) {
             throw new EventTimeInPastException("Новое время мероприятия указано в прошлом!");
@@ -184,7 +184,7 @@ public class EventService {
         }
     }
 
-    private EventEntity validateAndGetEventEntity(Integer eventId) {
+    private EventEntity validateAndGetEventEntity(Long eventId) {
         EventEntity eventEntity = repository.findEventById(eventId)
                 .orElseThrow(() -> new EventNotFoundException(eventId));
 
