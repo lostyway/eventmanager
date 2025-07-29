@@ -1,6 +1,5 @@
 package com.lostway.eventmanager.security;
 
-import com.lostway.eventmanager.exception.controller.CustomAccessDeniedHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -68,6 +68,7 @@ public class UserService {
             throw new IncorrectPasswordException("Пароль был введен неверно!");
         }
 
+        model.setId(userModelInBase.getId());
         String token = jwtUtil.generateToken(model);
         jwtUtil.validateToken(token);
         return token;

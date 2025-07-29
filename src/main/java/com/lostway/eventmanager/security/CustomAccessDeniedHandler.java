@@ -1,4 +1,4 @@
-package com.lostway.eventmanager.exception.controller;
+package com.lostway.eventmanager.security;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

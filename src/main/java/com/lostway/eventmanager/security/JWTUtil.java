@@ -30,9 +30,9 @@ public class JWTUtil {
 
     public String generateToken(UserModel user) {
         return Jwts.builder()
-                .setSubject("User details")
                 .setClaims(Map.of("role", user.getRole().name()))
                 .setIssuedAt(new Date())
+                .claim("userId", user.getId())
                 .setSubject(user.getLogin())
                 .setAudience("USERS")
                 .setIssuer("event manager")
