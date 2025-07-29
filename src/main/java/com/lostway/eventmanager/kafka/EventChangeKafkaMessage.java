@@ -21,20 +21,4 @@ public class EventChangeKafkaMessage {
     private FieldChange<Long> locationId;
     private FieldChange<EventStatus> status;
     private List<Long> users;
-
-    @Override
-    public String toString() {
-        return "EventChangeKafkaMessage{" + System.lineSeparator() +
-                "eventId=" + eventId + System.lineSeparator() +
-                ", changedById=" + changedById + System.lineSeparator() +
-                ", name=" + name + System.lineSeparator() +
-                ", maxPlaces=" + maxPlaces + System.lineSeparator() +
-                ", date=" + date + System.lineSeparator() +
-                ", cost=" + cost + System.lineSeparator() +
-                ", duration=" + duration + System.lineSeparator() +
-                ", locationId=" + locationId + System.lineSeparator() +
-                ", status=" + status + System.lineSeparator() +
-                ", users=" + users + System.lineSeparator() +
-                '}';
-    }
 }

@@ -20,6 +20,27 @@ import static jakarta.persistence.LockModeType.PESSIMISTIC_WRITE;
 @Repository
 public interface EventRepository extends JpaRepository<EventEntity, Long> {
 
+    @Query(value = """
+                SELECT EXISTS(
+                    SELECT 1
+                    FROM events e
+                    WHERE e.location_id = :locationId
+                      AND e.status IN (:statuses)
+                      AND (
+                          e.date < :requestedEnd
+                          AND e.date + (e.duration * interval '1 minute') > :requestedStart
+                      )
+                    AND (:eventId IS NULL OR e.id != :eventId)
+                )
+            """, nativeQuery = true)
+    boolean isLocationPlanned(
+            @Param("locationId") Long locationId,
+            @Param("statuses") List<String> statuses,
+            @Param("requestedStart") LocalDateTime requestedStart,
+            @Param("requestedEnd") LocalDateTime requestedEnd,
+            @Param("eventId") Long eventId
+    );
+
     boolean existsEventEntitiesByLocationAndStatusIn(LocationEntity location, List<EventStatus> statues);
 
     List<EventEntity> findEventByOwnerId(Long id);

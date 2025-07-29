@@ -1,4 +1,4 @@
-spring:
+Бspring:
   kafka:
     bootstrap-servers: kafka:9092, kafka-2:9093, kafka-3:9094
   datasource:

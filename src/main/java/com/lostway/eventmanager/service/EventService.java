@@ -7,6 +7,7 @@ import com.lostway.eventmanager.kafka.EventChangeKafkaMessage;
 import com.lostway.eventmanager.kafka.EventKafkaProducer;
 import com.lostway.eventmanager.kafka.FieldChange;
 import com.lostway.eventmanager.mapper.EventMapper;
+import com.lostway.eventmanager.mapper.LocationMapper;
 import com.lostway.eventmanager.repository.EventRepository;
 import com.lostway.eventmanager.repository.UserEventRegistrationEntityRepository;
 import com.lostway.eventmanager.repository.entity.EventEntity;
@@ -37,16 +38,13 @@ public class EventService {
     private final LocationService locationService;
     private final EventMapper mapper;
     private final UserService userService;
-    private final EventValidatorService eventValidatorService;
     private final UserEventRegistrationEntityRepository userEventRegistrationEntityRepository;
     private final EventKafkaProducer eventKafkaProducer;
+    private final LocationMapper locationMapper;
 
     public Event createNewEvent(Event eventToCreate) {
         Location location = locationService.findById(eventToCreate.getLocationId());
-
-        if (eventValidatorService.isLocationPlanned(location)) {
-            throw new LocationIsPlannedException("Локация уже занята другим мероприятием");
-        }
+        isLocationPlanned(eventToCreate, location);
 
         if (location.getCapacity() < eventToCreate.getMaxPlaces()) {
             throw new CapacityNotEnoughException("Мест на локации меньше чем предполагается на мероприятии.");
@@ -142,6 +140,9 @@ public class EventService {
             throw new EventTimeInPastException("Новое время мероприятия указано в прошлом!");
         }
 
+        model.setId(eventId);
+        isLocationPlanned(model, locationService.findById(model.getLocationId()));
+
         EventEntity oldEntity = validateAndGetEventEntity(eventId);
         Event oldEvent = mapper.toModel(oldEntity);
         EventEntity newEntity = createNewEntity(model, oldEntity);
@@ -178,6 +179,7 @@ public class EventService {
         UserEntity userEntity = userService.getUserByIdForUser(getSecurityUserId());
 
         EventEntity newEntity = mapper.toEntity(model);
+        newEntity.setId(oldEntity.getId());
         newEntity.setOwner(userEntity);
         newEntity.setLocation(location);
         newEntity.setStatus(EventStatus.WAIT_START);
@@ -215,5 +217,19 @@ public class EventService {
         registration.setUser(userEntity);
         registration.setEvent(eventEntity);
         userEventRegistrationEntityRepository.save(registration);
+    }
+
+    private void isLocationPlanned(Event eventToCreate, Location location) {
+        LocalDateTime startTime = eventToCreate.getDate();
+        LocalDateTime requestEnd = startTime.plusMinutes(eventToCreate.getDuration());
+
+        if (repository.isLocationPlanned(location.getId(),
+                List.of(EventStatus.WAIT_START.toString(), EventStatus.STARTED.toString()),
+                startTime,
+                requestEnd,
+                eventToCreate.getId()
+        )) {
+            throw new LocationIsPlannedException("Локация уже занята другим мероприятием");
+        }
     }
 }
