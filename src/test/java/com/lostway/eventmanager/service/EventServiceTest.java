@@ -70,7 +70,7 @@ class EventServiceTest extends IntegrationTestBase {
 
     @Test
     void whenCreatingEventIsFailedByEvent() {
-        event = eventService.createNewEvent(event);
+        eventService.createNewEvent(event);
 
         Exception exception = assertThrows(LocationIsPlannedException.class, () -> eventService.createNewEvent(event));
         assertThat(exception).hasMessageContaining("Локация уже занята другим мероприятием");

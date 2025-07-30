@@ -22,7 +22,6 @@ services:
   eventmanager-db:
     image: postgres:15
     container_name: eventmanager-db
-    restart: always
     environment:
       POSTGRES_DB: eventmanager
       POSTGRES_USER: postgres
@@ -33,6 +32,7 @@ services:
       - "5433:5432"
     networks:
       - event-net
+    restart: always
 
   event-notificator:
     build:
@@ -45,7 +45,6 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://event-notificator-db:5432/eventnotificator
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: password
-    restart: unless-stopped
     depends_on:
       - event-notificator-db
       - kafka
@@ -53,11 +52,11 @@ services:
       - kafka-3
     networks:
       - event-net
+    restart: unless-stopped
 
   event-notificator-db:
     image: postgres:15
     container_name: event-notificator-db
-    restart: always
     environment:
       POSTGRES_DB: eventnotificator
       POSTGRES_USER: postgres
@@ -68,6 +67,7 @@ services:
       - "5434:5432"
     networks:
       - event-net
+    restart: always
 
   zookeeper:
     container_name: zookeeper
@@ -77,9 +77,9 @@ services:
       ZOOKEEPER_TICK_TIME: 2000
     ports:
       - 22181:2181
-    restart: unless-stopped
     networks:
       event-net:
+    restart: unless-stopped
 
   kafka:
     image: confluentinc/cp-kafka:7.4.4
@@ -97,9 +97,9 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
       KAFKA_MIN_INSYNC_REPLICAS: 2
       KAFKA_DEFAULT_REPLICATION_FACTOR: 3
-    restart: unless-stopped
     networks:
       event-net:
+    restart: unless-stopped
 
   kafka-2:
     image: confluentinc/cp-kafka:7.4.4
@@ -117,9 +117,9 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
       KAFKA_MIN_INSYNC_REPLICAS: 2
       KAFKA_DEFAULT_REPLICATION_FACTOR: 3
-      restart: unless-stopped
     networks:
       - event-net
+    restart: unless-stopped
 
   kafka-3:
     image: confluentinc/cp-kafka:7.4.4
@@ -137,9 +137,9 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
       KAFKA_MIN_INSYNC_REPLICAS: 2
       KAFKA_DEFAULT_REPLICATION_FACTOR: 3
-      restart: unless-stopped
     networks:
       - event-net
+    restart: unless-stopped
 
 volumes:
   eventmanager-data:
