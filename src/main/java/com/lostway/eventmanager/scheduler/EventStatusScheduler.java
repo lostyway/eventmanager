@@ -1,8 +1,8 @@
 package com.lostway.eventmanager.scheduler;
 
-import com.lostway.eventmanager.enums.EventStatus;
+import com.lostway.eventdtos.EventStatus;
+import com.lostway.eventdtos.EventStatusChangeKafkaMessage;
 import com.lostway.eventmanager.kafka.EventKafkaProducer;
-import com.lostway.eventmanager.kafka.EventStatusChangeKafkaMessage;
 import com.lostway.eventmanager.repository.EventRepository;
 import com.lostway.eventmanager.repository.entity.EventEntity;
 import lombok.RequiredArgsConstructor;

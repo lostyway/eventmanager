@@ -1,8 +1,8 @@
 package com.lostway.eventmanager.repository.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.lostway.eventdtos.EventStatus;
 import com.lostway.eventmanager.audit.AuditableEntity;
-import com.lostway.eventmanager.enums.EventStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;

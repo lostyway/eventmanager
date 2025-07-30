@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
-import static com.lostway.eventmanager.enums.EventStatus.*;
+import static com.lostway.eventdtos.EventStatus.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class EventStatusSchedulerTest extends IntegrationTestBase {

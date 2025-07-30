@@ -1,6 +1,6 @@
 package com.lostway.eventmanager.service.model;
 
-import com.lostway.eventmanager.enums.EventStatus;
+import com.lostway.eventdtos.EventStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -31,5 +31,6 @@ public class Event {
 
     private Long ownerId;
 
+    @Builder.Default
     private EventStatus status = EventStatus.WAIT_START;
 }

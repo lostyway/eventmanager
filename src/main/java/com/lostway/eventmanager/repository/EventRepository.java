@@ -1,7 +1,7 @@
 package com.lostway.eventmanager.repository;
 
+import com.lostway.eventdtos.EventStatus;
 import com.lostway.eventmanager.controller.dto.EventSearchRequestDto;
-import com.lostway.eventmanager.enums.EventStatus;
 import com.lostway.eventmanager.repository.entity.EventEntity;
 import com.lostway.eventmanager.repository.entity.LocationEntity;
 import org.springframework.data.jpa.repository.JpaRepository;

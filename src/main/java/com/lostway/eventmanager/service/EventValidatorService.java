@@ -1,6 +1,6 @@
 package com.lostway.eventmanager.service;
 
-import com.lostway.eventmanager.enums.EventStatus;
+import com.lostway.eventdtos.EventStatus;
 import com.lostway.eventmanager.mapper.LocationMapper;
 import com.lostway.eventmanager.repository.EventRepository;
 import com.lostway.eventmanager.service.model.Location;

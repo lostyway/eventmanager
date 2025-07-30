@@ -1,7 +1,7 @@
 package com.lostway.eventmanager.controller.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.lostway.eventmanager.enums.EventStatus;
+import com.lostway.eventdtos.EventStatus;
 import jakarta.validation.constraints.*;
 
 import java.time.LocalDateTime;

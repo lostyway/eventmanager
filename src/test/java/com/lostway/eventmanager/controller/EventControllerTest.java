@@ -1,12 +1,12 @@
 package com.lostway.eventmanager.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.lostway.eventdtos.EventStatus;
 import com.lostway.eventmanager.config.TestSecurityConfig;
 import com.lostway.eventmanager.controller.dto.EventCreateRequestDto;
 import com.lostway.eventmanager.controller.dto.EventDto;
 import com.lostway.eventmanager.controller.dto.EventSearchRequestDto;
 import com.lostway.eventmanager.controller.dto.EventUpdateRequestDto;
-import com.lostway.eventmanager.enums.EventStatus;
 import com.lostway.eventmanager.exception.LocationIsPlannedException;
 import com.lostway.eventmanager.mapper.EventMapper;
 import com.lostway.eventmanager.mapper.EventMapperImpl;

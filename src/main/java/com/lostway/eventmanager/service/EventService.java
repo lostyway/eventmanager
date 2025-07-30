@@ -1,11 +1,11 @@
 package com.lostway.eventmanager.service;
 
+import com.lostway.eventdtos.EventChangeKafkaMessage;
+import com.lostway.eventdtos.EventStatus;
+import com.lostway.eventdtos.FieldChange;
 import com.lostway.eventmanager.controller.dto.EventSearchRequestDto;
-import com.lostway.eventmanager.enums.EventStatus;
 import com.lostway.eventmanager.exception.*;
-import com.lostway.eventmanager.kafka.EventChangeKafkaMessage;
 import com.lostway.eventmanager.kafka.EventKafkaProducer;
-import com.lostway.eventmanager.kafka.FieldChange;
 import com.lostway.eventmanager.mapper.EventMapper;
 import com.lostway.eventmanager.mapper.LocationMapper;
 import com.lostway.eventmanager.repository.EventRepository;
